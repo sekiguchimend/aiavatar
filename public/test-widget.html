@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar Widget テスト</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #1a1a1a;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    .widget-wrapper {
+      border: 3px solid #3B82F6;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 350px;
+    }
+    .controls {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .control-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    input[type="text"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #3B82F6;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      padding: 12px 24px;
+      background: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #2563EB;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button.secondary {
+      background: #10B981;
+    }
+    button.secondary:hover {
+      background: #059669;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #3B82F6;
+      font-size: 14px;
+      min-height: 50px;
+    }
+    .status.success {
+      border-left-color: #10B981;
+      background: #f0fdf4;
+    }
+    .status.error {
+      border-left-color: #DC3545;
+      background: #fef2f2;
+    }
+    .status.info {
+      border-left-color: #3B82F6;
+      background: #eff6ff;
+    }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+    .code-block code {
+      display: block;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 Avatar Widget テスト</h1>
+    <p class="subtitle">scriptタグで導入したAvatar Widgetの動作確認</p>
+    
+    <div class="controls">
+      <div class="control-group">
+        <label>API Key (Gemini):</label>
+        <input type="text" id="google-key-input" placeholder="AIza..." />
+      </div>
+      <div class="control-group">
+        <label>API URL:</label>
+        <input type="text" id="api-url-input" value="http://localhost:3000" />
+      </div>
+      <div class="button-group">
+        <button onclick="initWidget()">Widgetを初期化</button>
+        <button onclick="sendTestMessage()" class="secondary">テストメッセージ送信</button>
+        <button onclick="removeWidget()" style="background: #DC3545;">Widgetを削除</button>
+      </div>
+    </div>
+
+    <div class="status" id="status">
+      <strong>ステータス:</strong> 準備中... Widgetを初期化してください。
+    </div>
+
+    <div class="widget-wrapper" id="widget-container">
+      <!-- Widget will be inserted here -->
+    </div>
+
+    <div class="code-block">
+      <code id="code-display">// Widget要素がここに表示されます</code>
+    </div>
+  </div>
+
+  <!-- Avatar Widget Script -->
+  <script src="/avatar-widget.js"></script>
+  
+  <script>
+    let widget = null;
+    const statusDiv = document.getElementById('status');
+    const widgetContainer = document.getElementById('widget-container');
+    const codeDisplay = document.getElementById('code-display');
+
+    function updateStatus(message, type = 'info') {
+      statusDiv.className = `status ${type}`;
+      statusDiv.innerHTML = `<strong>ステータス:</strong> ${message}`;
+    }
+
+    function updateCode() {
+      const googleKey = document.getElementById('google-key-input').value;
+      const apiUrl = document.getElementById('api-url-input').value;
+      const code = `<avatar-widget
+  google-key="${googleKey || 'your-google-api-key'}"
+  api-url="${apiUrl || 'http://localhost:3000'}"
+  ai-service="google"
+  ai-model="gemini-2.5-flash"
+  model-type="live2d"
+  character-name="アシスタント"
+  width="800px"
+  height="500px"
+  position="relative"
+></avatar-widget>`;
+      codeDisplay.textContent = code;
+    }
+
+    function initWidget() {
+      // Remove existing widget
+      if (widget) {
+        widget.remove();
+      }
+
+      const googleKey = document.getElementById('google-key-input').value;
+      const apiUrl = document.getElementById('api-url-input').value || 'http://localhost:3000';
+
+      if (!googleKey) {
+        updateStatus('⚠️ Gemini API Keyを入力してください', 'error');
+        return;
+      }
+
+      updateStatus('🔄 Widgetを初期化中...', 'info');
+
+      // Create widget element
+      widget = document.createElement('avatar-widget');
+      widget.setAttribute('google-key', googleKey);
+      widget.setAttribute('api-url', apiUrl);
+      widget.setAttribute('ai-service', 'google');
+      widget.setAttribute('ai-model', 'gemini-2.5-flash');
+      widget.setAttribute('model-type', 'live2d');
+      widget.setAttribute('character-name', 'アシスタント');
+      widget.setAttribute('width', '800px');
+      widget.setAttribute('height', '500px');
+      widget.setAttribute('position', 'relative');
+
+      // Event listeners
+      widget.addEventListener('ready', (e) => {
+        updateStatus('✅ Widget準備完了！会話を開始できます。', 'success');
+        console.log('Widget ready:', e.detail);
+      });
+
+      widget.addEventListener('message-sent', (e) => {
+        updateStatus(`📤 メッセージ送信: "${e.detail.message}"`, 'info');
+        console.log('Message sent:', e.detail);
+      });
+
+      widget.addEventListener('message-received', (e) => {
+        updateStatus(`📥 メッセージ受信: "${e.detail.message.substring(0, 50)}..."`, 'success');
+        console.log('Message received:', e.detail);
+      });
+
+      widget.addEventListener('error', (e) => {
+        updateStatus(`❌ エラー: ${e.detail.message || '不明なエラー'}`, 'error');
+        console.error('Widget error:', e.detail);
+      });
+
+      // Append to container
+      widgetContainer.appendChild(widget);
+      updateCode();
+
+      // Wait a bit for widget to initialize
+      setTimeout(() => {
+        if (widget) {
+          if (widget.shadowRoot) {
+            updateStatus('✅ Widget要素が作成されました。iframeの読み込みを待っています...', 'info');
+          } else {
+            updateStatus('⚠️ Widget要素は作成されましたが、shadowRootが利用できません', 'info');
+          }
+        }
+      }, 500);
+    }
+
+    function sendTestMessage() {
+      if (!widget) {
+        updateStatus('⚠️ まずWidgetを初期化してください', 'error');
+        return;
+      }
+
+      // Check if sendMessage method exists
+      if (typeof widget.sendMessage !== 'function') {
+        updateStatus('⚠️ sendMessageメソッドが利用できません。Widgetの初期化を待っています...', 'error');
+        // Try again after a short delay
+        setTimeout(() => {
+          if (typeof widget.sendMessage === 'function') {
+            sendTestMessage();
+          } else {
+            updateStatus('❌ Widgetの初期化に失敗しました', 'error');
+          }
+        }, 1000);
+        return;
+      }
+
+      const testMessages = [
+        'こんにちは！',
+        '自己紹介をしてください',
+        '今日の天気は？',
+        'ありがとう'
+      ];
+      const randomMessage = testMessages[Math.floor(Math.random() * testMessages.length)];
+      
+      updateStatus(`🔄 メッセージ送信中: "${randomMessage}"`, 'info');
+      
+      try {
+        widget.sendMessage(randomMessage);
+      } catch (error) {
+        updateStatus(`❌ メッセージ送信エラー: ${error.message}`, 'error');
+        console.error('sendMessage error:', error);
+      }
+    }
+
+    function removeWidget() {
+      if (widget) {
+        widget.remove();
+        widget = null;
+        updateStatus('🗑️ Widgetを削除しました', 'info');
+        codeDisplay.textContent = '// Widget要素がここに表示されます';
+      }
+    }
+
+    // Update code display when inputs change
+    document.getElementById('google-key-input').addEventListener('input', updateCode);
+    document.getElementById('api-url-input').addEventListener('input', updateCode);
+
+    // Initial code display
+    updateCode();
+
+    // Check if custom element is registered
+    setTimeout(() => {
+      if (customElements.get('avatar-widget')) {
+        updateStatus('✅ Avatar Widgetスクリプトが読み込まれました', 'success');
+      } else {
+        updateStatus('❌ Avatar Widgetスクリプトの読み込みに失敗しました', 'error');
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
+
