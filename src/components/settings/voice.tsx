@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
@@ -91,8 +90,6 @@ const Voice = () => {
     (s) => s.nijivoiceEmotionalLevel
   )
   const nijivoiceSoundDuration = settingsStore((s) => s.nijivoiceSoundDuration)
-
-  const { t } = useTranslation()
   const [nijivoiceSpeakers, setNijivoiceSpeakers] = useState<Array<any>>([])
   const [prevNijivoiceActorId, setPrevNijivoiceActorId] = useState<string>('')
   const [speakers_aivis, setSpeakers_aivis] = useState<Array<any>>([])
@@ -187,7 +184,8 @@ const Voice = () => {
   if (realtimeAPIMode || audioMode) {
     return (
       <div className="text-center text-xl whitespace-pre-line">
-        {t('CannotUseVoice')}
+        {`リアルタイムAPIモード または オーディオモードが有効の場合、
+合成音声設定は不要です。`}
       </div>
     )
   }
@@ -202,12 +200,10 @@ const Voice = () => {
           height={24}
           className="mr-2"
         />
-        <h2 className="text-2xl font-bold">{t('VoiceSettings')}</h2>
+        <h2 className="text-2xl font-bold">{'合成音声設定'}</h2>
       </div>
-      <div className="mb-4 text-xl font-bold">
-        {t('SyntheticVoiceEngineChoice')}
-      </div>
-      <div>{t('VoiceEngineInstruction')}</div>
+      <div className="mb-4 text-xl font-bold">{'合成音声エンジンの選択'}</div>
+      <div>{'使用する合成音声エンジンを選択してください。'}</div>
       <div className="my-2">
         <select
           value={selectVoice}
@@ -216,28 +212,30 @@ const Voice = () => {
           }
           className="px-4 py-2 bg-white hover:bg-white-hover rounded-lg"
         >
-          <option value="voicevox">{t('UsingVoiceVox')}</option>
-          <option value="koeiromap">{t('UsingKoeiromap')}</option>
-          <option value="google">{t('UsingGoogleTTS')}</option>
-          <option value="stylebertvits2">{t('UsingStyleBertVITS2')}</option>
-          <option value="aivis_speech">{t('UsingAivisSpeech')}</option>
-          <option value="aivis_cloud">{t('UsingAivisCloud')}</option>
-          <option value="gsvitts">{t('UsingGSVITTS')}</option>
-          <option value="elevenlabs">{t('UsingElevenLabs')}</option>
-          <option value="openai">{t('UsingOpenAITTS')}</option>
-          <option value="azure">{t('UsingAzureTTS')}</option>
-          <option value="nijivoice">{t('UsingNijiVoice')}</option>
+          <option value="voicevox">{'VOICEVOXを使用する'}</option>
+          <option value="koeiromap">{'Koeiromapを使用する'}</option>
+          <option value="google">{'Google Text-to-Speechを使用する'}</option>
+          <option value="stylebertvits2">{'Style-Bert-VITS2を使用する'}</option>
+          <option value="aivis_speech">{'AivisSpeechを使用する'}</option>
+          <option value="aivis_cloud">{'AIVIS Cloud APIを使用する'}</option>
+          <option value="gsvitts">{'GSVI TTSを使用する'}</option>
+          <option value="elevenlabs">{'ElevenLabsを使用する'}</option>
+          <option value="openai">{'OpenAIを使用する'}</option>
+          <option value="azure">{'Azure OpenAIを使用する'}</option>
+          <option value="nijivoice">{'にじボイスを使用する'}</option>
         </select>
       </div>
 
       <div className="mt-10">
-        <div className="mb-4 text-xl font-bold">{t('VoiceAdjustment')}</div>
+        <div className="mb-4 text-xl font-bold">{'声の調整'}</div>
         {(() => {
           if (selectVoice === 'koeiromap') {
             return (
               <>
                 <div>
-                  {t('KoeiromapInfo')}
+                  {
+                    'KoemotionのKoeiromap APIを使用しています。日本語のみに対応しています。詳しくは下記をご覧ください。'
+                  }
                   <br />
                   <Link
                     url="https://koemotion.rinna.co.jp"
@@ -350,14 +348,16 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('VoiceVoxInfo')}
+                  {
+                    'VOICEVOXを使用しています。日本語のみに対応しています。ローカルAPIを使用するので下記のサイトから環境にあったアプリをダウンロードし、起動しておく必要があります。'
+                  }
                   <br />
                   <Link
                     url="https://voicevox.hiroshiba.jp/"
                     label="https://voicevox.hiroshiba.jp/"
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('VoicevoxServerUrl')}</div>
+                <div className="mt-4 font-bold">{'VOICEVOX サーバーURL'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -371,7 +371,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('SpeakerSelection')}</div>
+                <div className="mt-4 font-bold">{'ボイスタイプ選択'}</div>
                 <div className="flex items-center">
                   <select
                     value={voicevoxSpeaker}
@@ -382,7 +382,7 @@ const Voice = () => {
                     }
                     className="px-4 py-2 bg-white hover:bg-white-hover rounded-lg"
                   >
-                    <option value="">{t('Select')}</option>
+                    <option value="">{'選択してください'}</option>
                     {speakers.map((speaker) => (
                       <option key={speaker.id} value={speaker.id}>
                         {speaker.speaker}
@@ -392,7 +392,7 @@ const Voice = () => {
                 </div>
                 <div className="mt-6 font-bold">
                   <div className="select-none">
-                    {t('VoicevoxSpeed')}: {voicevoxSpeed}
+                    {'話速'}: {voicevoxSpeed}
                   </div>
                   <input
                     type="range"
@@ -408,7 +408,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('VoicevoxPitch')}: {voicevoxPitch}
+                    {'音高'}: {voicevoxPitch}
                   </div>
                   <input
                     type="range"
@@ -424,7 +424,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('VoicevoxIntonation')}: {voicevoxIntonation}
+                    {'抑揚'}: {voicevoxIntonation}
                   </div>
                   <input
                     type="range"
@@ -446,8 +446,12 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('GoogleTTSInfo')}
-                  {t('AuthFileInstruction')}
+                  {
+                    'Google Cloud Text-to-Speechを使用しています。多言語に対応可能です。'
+                  }
+                  {
+                    'APIキーまたは認証用のJSONファイルが必要です。下記から取得し、JSONファイルの場合はリポジトリのルートフォルダに credentials.json という名称で配置してください。'
+                  }
                   <br />
                   <Link
                     url="https://developers.google.com/workspace/guides/create-credentials?#create_credentials_for_a_service_account"
@@ -455,14 +459,14 @@ const Voice = () => {
                   />
                   <br />
                   <br />
-                  {t('LanguageModelURL')}
+                  {'言語モデルは下記のURLから選択してください。'}
                   <br />
                   <Link
                     url="https://cloud.google.com/text-to-speech/docs/voices"
                     label="https://cloud.google.com/text-to-speech/docs/voices"
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('LanguageChoice')}</div>
+                <div className="mt-4 font-bold">{'言語選択'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -480,7 +484,9 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('StyleBertVITS2Info')}
+                  {
+                    'Style-Bert-VITS2を使用しています。日・英・中のみに対応しています。ローカルAPIを使用する場合は、下記のサイトから環境にあったアプリをダウンロードし起動しておく必要があります。必要な場合はAPIキーも設定してください。'
+                  }
                   <br />
                   <Link
                     url="https://github.com/litagin02/Style-Bert-VITS2"
@@ -489,9 +495,7 @@ const Voice = () => {
                   <br />
                   <br />
                 </div>
-                <div className="mt-4 font-bold">
-                  {t('StyleBeatVITS2ServerURL')}
-                </div>
+                <div className="mt-4 font-bold">{'サーバーURL'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -505,9 +509,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">
-                  {t('StyleBeatVITS2ApiKey')}
-                </div>
+                <div className="mt-4 font-bold">{'API キー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -521,9 +523,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">
-                  {t('StyleBeatVITS2ModelID')}
-                </div>
+                <div className="mt-4 font-bold">{'モデルID'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -537,7 +537,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('StyleBeatVITS2Style')}</div>
+                <div className="mt-4 font-bold">{'スタイル'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -552,7 +552,7 @@ const Voice = () => {
                   />
                 </div>
                 <div className="mt-4 font-bold">
-                  {t('StyleBeatVITS2SdpRatio')}: {stylebertvits2SdpRatio}
+                  {'SDP/DP混合比'}: {stylebertvits2SdpRatio}
                 </div>
                 <input
                   type="range"
@@ -568,7 +568,7 @@ const Voice = () => {
                   }}
                 ></input>
                 <div className="mt-4 font-bold">
-                  {t('StyleBeatVITS2Length')}: {stylebertvits2Length}
+                  {'話速'}: {stylebertvits2Length}
                 </div>
                 <input
                   type="range"
@@ -589,7 +589,9 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('AivisSpeechInfo')}
+                  {
+                    'AivisSpeechを使用しています。日本語のみに対応しています。ローカルAPIを使用するので下記のサイトから環境にあったアプリをダウンロードし、起動しておく必要があります。'
+                  }
                   <br />
                   <Link
                     url="https://aivis-project.com/"
@@ -597,7 +599,7 @@ const Voice = () => {
                   />
                 </div>
                 <div className="mt-4 font-bold">
-                  {t('AivisSpeechServerUrl')}
+                  {'AivisSpeech サーバーURL'}
                 </div>
                 <div className="mt-2">
                   <input
@@ -612,7 +614,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AivisSpeechSpeaker')}</div>
+                <div className="mt-4 font-bold">{'話者'}</div>
                 <div className="flex items-center">
                   <select
                     value={aivisSpeechSpeaker}
@@ -623,7 +625,7 @@ const Voice = () => {
                     }
                     className="px-4 py-2 bg-white hover:bg-white-hover rounded-lg"
                   >
-                    <option value="">{t('Select')}</option>
+                    <option value="">{'選択してください'}</option>
                     {speakersAivis.map((speaker) => (
                       <option key={speaker.id} value={speaker.id}>
                         {speaker.speaker}
@@ -650,12 +652,12 @@ const Voice = () => {
                     }}
                     className="ml-4"
                   >
-                    {t('UpdateSpeakerList')}
+                    {'話者リストを更新'}
                   </TextButton>
                 </div>
                 <div className="mt-6 font-bold">
                   <div className="select-none">
-                    {t('AivisSpeechSpeed')}: {aivisSpeechSpeed}
+                    {'話速'}: {aivisSpeechSpeed}
                   </div>
                   <input
                     type="range"
@@ -671,7 +673,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisSpeechPitch')}: {aivisSpeechPitch}
+                    {'音高'}: {aivisSpeechPitch}
                   </div>
                   <input
                     type="range"
@@ -687,7 +689,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisSpeechIntonation')}: {aivisSpeechIntonation}
+                    {'抑揚'}: {aivisSpeechIntonation}
                   </div>
                   <input
                     type="range"
@@ -709,14 +711,16 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('AivisCloudInfo')}
+                  {
+                    'AIVIS Cloud APIを使用しています。日本語のみに対応しています。APIキーを下記のURLから取得してください。'
+                  }
                   <br />
                   <Link
                     url="https://aivis-project.com/"
                     label="https://aivis-project.com/"
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AivisCloudApiKey')}</div>
+                <div className="mt-4 font-bold">{'AIVIS Cloud API キー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -730,7 +734,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AivisCloudModelUuid')}</div>
+                <div className="mt-4 font-bold">{'モデルUUID'}</div>
                 <div className="flex items-center gap-2">
                   <select
                     className="px-4 py-2 bg-white hover:bg-white-hover rounded-lg flex-1"
@@ -741,7 +745,7 @@ const Voice = () => {
                       })
                     }
                   >
-                    <option value="">{t('Select')}</option>
+                    <option value="">{'選択してください'}</option>
                     {aivisModels.map((model) => (
                       <option key={model.uuid} value={model.uuid}>
                         {model.name}
@@ -754,14 +758,14 @@ const Voice = () => {
                     disabled={loadingModels}
                     className="whitespace-nowrap"
                   >
-                    {loadingModels ? t('Loading') : t('LoadModels')}
+                    {loadingModels ? '読み込み中...' : 'モデル一覧を読み込む'}
                   </TextButton>
                 </div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
                     type="text"
-                    placeholder={t('AivisCloudModelUuidPlaceholder')}
+                    placeholder={'または直接UUIDを入力'}
                     value={aivisCloudModelUuid}
                     onChange={(e) =>
                       settingsStore.setState({
@@ -770,12 +774,12 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AivisCloudStyleId')}</div>
+                <div className="mt-4 font-bold">{'スタイルID(オプション)'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
                     type="text"
-                    placeholder={t('AivisCloudStyleIdPlaceholder')}
+                    placeholder={'空欄でデフォルトスタイル'}
                     value={aivisCloudStyleId}
                     onChange={(e) =>
                       settingsStore.setState({
@@ -784,7 +788,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AivisCloudStyleName')}</div>
+                <div className="mt-4 font-bold">{'スタイル名(オプション)'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -810,12 +814,12 @@ const Voice = () => {
                         })
                       }
                     />
-                    <span>{t('AivisCloudUseStyleName')}</span>
+                    <span>{'スタイル名を使用'}</span>
                   </label>
                 </div>
                 <div className="mt-6 font-bold">
                   <div className="select-none">
-                    {t('AivisCloudSpeed')}: {aivisCloudSpeed}
+                    {'話速'}: {aivisCloudSpeed}
                   </div>
                   <input
                     type="range"
@@ -831,7 +835,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisCloudPitch')}: {aivisCloudPitch}
+                    {'音高'}: {aivisCloudPitch}
                   </div>
                   <input
                     type="range"
@@ -847,7 +851,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisCloudTempoDynamics')}: {aivisCloudTempoDynamics}
+                    {'テンポの緩急'}: {aivisCloudTempoDynamics}
                   </div>
                   <input
                     type="range"
@@ -863,8 +867,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisCloudIntonationScale')}:{' '}
-                    {aivisCloudIntonationScale}
+                    {'感情表現強さ'}: {aivisCloudIntonationScale}
                   </div>
                   <input
                     type="range"
@@ -880,8 +883,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisCloudPrePhonemeLength')}:{' '}
-                    {aivisCloudPrePhonemeLength}
+                    {'音声前の無音時間'}: {aivisCloudPrePhonemeLength}
                   </div>
                   <input
                     type="range"
@@ -897,8 +899,7 @@ const Voice = () => {
                     }}
                   ></input>
                   <div className="select-none">
-                    {t('AivisCloudPostPhonemeLength')}:{' '}
-                    {aivisCloudPostPhonemeLength}
+                    {'音声後の無音時間'}: {aivisCloudPostPhonemeLength}
                   </div>
                   <input
                     type="range"
@@ -919,8 +920,8 @@ const Voice = () => {
           } else if (selectVoice === 'gsvitts') {
             return (
               <>
-                <div>{t('GSVITTSInfo')}</div>
-                <div className="mt-4 font-bold">{t('GSVITTSServerUrl')}</div>
+                <div>{'GSVI TTS設定'}</div>
+                <div className="mt-4 font-bold">{'GSVI TTSサーバーのURL'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -934,7 +935,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('GSVITTSModelID')}</div>
+                <div className="mt-4 font-bold">{'GSVI TTS モデルID'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -946,7 +947,11 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('GSVITTSBatchSize')}</div>
+                <div className="mt-4 font-bold">
+                  {
+                    'GSVI TTS バッチサイズ (1 ~ 100 数値が大きいほど推論速度は速くなりますが、大きすぎるとメモリを使い果たす可能性があります)'
+                  }
+                </div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -961,7 +966,9 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('GSVITTSSpeechRate')}</div>
+                <div className="mt-4 font-bold">
+                  {'話速 (0.5 ~ 2.0 数値が大きいほど速い)'}
+                </div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -982,7 +989,9 @@ const Voice = () => {
             return (
               <>
                 <div>
-                  {t('ElevenLabsInfo')}
+                  {
+                    'ElevenLabs APIを使用しています。多言語に対応可能です。APIキーを下記のURLから取得してください。'
+                  }
                   <br />
                   <Link
                     url="https://elevenlabs.io/api"
@@ -990,7 +999,7 @@ const Voice = () => {
                   />
                   <br />
                 </div>
-                <div className="mt-4 font-bold">{t('ElevenLabsApiKey')}</div>
+                <div className="mt-4 font-bold">{'ElevenLabs APIキー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -1004,9 +1013,9 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('ElevenLabsVoiceId')}</div>
+                <div className="mt-4 font-bold">{'ElevenLabs ボイスID'}</div>
                 <div className="mt-2">
-                  {t('ElevenLabsVoiceIdInfo')}
+                  {'ボイスIDは下記のURLから選択してください。'}
                   <br />
                   <Link
                     url="https://api.elevenlabs.io/v1/voices"
@@ -1032,8 +1041,12 @@ const Voice = () => {
           } else if (selectVoice === 'openai') {
             return (
               <>
-                <div>{t('OpenAITTSInfo')}</div>
-                <div className="mt-4 font-bold">{t('OpenAIAPIKeyLabel')}</div>
+                <div>
+                  {
+                    'OpenAIを使用しています。多言語に対応可能です。AIサービスでOpenAIを選択している場合は下記のAPIキーを設定する必要はありません。'
+                  }
+                </div>
+                <div className="mt-4 font-bold">{'OpenAI API キー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -1047,7 +1060,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('OpenAITTSVoice')}</div>
+                <div className="mt-4 font-bold">{'ボイスタイプ'}</div>
                 <div className="mt-2">
                   <select
                     value={openaiTTSVoice}
@@ -1070,7 +1083,7 @@ const Voice = () => {
                     <option value="shimmer">shimmer</option>
                   </select>
                 </div>
-                <div className="mt-4 font-bold">{t('OpenAITTSModel')}</div>
+                <div className="mt-4 font-bold">{'モデル'}</div>
                 <div className="mt-2">
                   <select
                     value={openaiTTSModel}
@@ -1089,7 +1102,7 @@ const Voice = () => {
                   </select>
                 </div>
                 <div className="mt-4 font-bold">
-                  {t('OpenAITTSSpeed')}: {openaiTTSSpeed}
+                  {'話速'}: {openaiTTSSpeed}
                 </div>
                 <input
                   type="range"
@@ -1109,8 +1122,10 @@ const Voice = () => {
           } else if (selectVoice === 'azure') {
             return (
               <>
-                <div>{t('AzureTTSInfo')}</div>
-                <div className="mt-4 font-bold">{t('AzureAPIKeyLabel')}</div>
+                <div>
+                  {'Azure OpenAIを使用しています。多言語に対応可能です。'}
+                </div>
+                <div className="mt-4 font-bold">{'Azure OpenAI API キー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -1124,7 +1139,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('AzureEndpoint')}</div>
+                <div className="mt-4 font-bold">{'Azure Endpoint'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -1138,7 +1153,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('OpenAITTSVoice')}</div>
+                <div className="mt-4 font-bold">{'ボイスタイプ'}</div>
                 <div className="mt-2">
                   <select
                     value={openaiTTSVoice}
@@ -1157,9 +1172,9 @@ const Voice = () => {
                     <option value="shimmer">shimmer</option>
                   </select>
                 </div>
-                <div className="mt-4 font-bold">{t('OpenAITTSModel')}</div>
+                <div className="mt-4 font-bold">{'モデル'}</div>
                 <div className="mt-4 font-bold">
-                  {t('OpenAITTSSpeed')}: {openaiTTSSpeed}
+                  {'話速'}: {openaiTTSSpeed}
                 </div>
                 <input
                   type="range"
@@ -1179,12 +1194,16 @@ const Voice = () => {
           } else if (selectVoice === 'nijivoice') {
             return (
               <>
-                <div>{t('NijiVoiceInfo')}</div>
+                <div>
+                  {
+                    'にじボイス APIを使用しています。日本語のみに対応しています。APIキーを下記のURLから取得してください。'
+                  }
+                </div>
                 <Link
                   url="https://app.nijivoice.com/"
                   label="https://app.nijivoice.com/"
                 />
-                <div className="mt-4 font-bold">{t('NijiVoiceApiKey')}</div>
+                <div className="mt-4 font-bold">{'にじボイス API キー'}</div>
                 <div className="mt-2">
                   <input
                     className="text-ellipsis px-4 py-2 w-col-span-4 bg-white hover:bg-white-hover rounded-lg"
@@ -1198,7 +1217,7 @@ const Voice = () => {
                     }
                   />
                 </div>
-                <div className="mt-4 font-bold">{t('NijiVoiceActorId')}</div>
+                <div className="mt-4 font-bold">{'話者ID'}</div>
                 <div className="mt-2">
                   <select
                     value={nijivoiceActorId}
@@ -1209,7 +1228,7 @@ const Voice = () => {
                     }}
                     className="px-4 py-2 bg-white hover:bg-white-hover rounded-lg"
                   >
-                    <option value="">{t('Select')}</option>
+                    <option value="">{'選択してください'}</option>
                     {nijivoiceSpeakers.map((actor) => (
                       <option key={actor.id} value={actor.id}>
                         {actor.name}
@@ -1218,7 +1237,7 @@ const Voice = () => {
                   </select>
                 </div>
                 <div className="mt-4 font-bold">
-                  {t('NijiVoiceSpeed')}: {nijivoiceSpeed}
+                  {'話速'}: {nijivoiceSpeed}
                 </div>
                 <input
                   type="range"
@@ -1234,7 +1253,7 @@ const Voice = () => {
                   }}
                 />
                 <div className="mt-4 font-bold">
-                  {t('NijiVoiceEmotionalLevel')}: {nijivoiceEmotionalLevel}
+                  {'感情レベル'}: {nijivoiceEmotionalLevel}
                 </div>
                 <input
                   type="range"
@@ -1250,7 +1269,7 @@ const Voice = () => {
                   }}
                 />
                 <div className="mt-4 font-bold">
-                  {t('NijiVoiceSoundDuration')}: {nijivoiceSoundDuration}
+                  {'音声の長さ'}: {nijivoiceSoundDuration}
                 </div>
                 <input
                   type="range"
@@ -1273,12 +1292,12 @@ const Voice = () => {
 
       {/* カスタムテキスト入力と統合テストボタン */}
       <div className="mt-10 p-4 bg-gray-50 rounded-lg">
-        <div className="mb-4 text-xl font-bold">{t('TestVoiceSettings')}</div>
+        <div className="mb-4 text-xl font-bold">{'ボイステスト'}</div>
         <div className="flex items-center">
           <input
             className="flex-1 px-4 py-2 bg-white hover:bg-white-hover rounded-lg"
             type="text"
-            placeholder={t('CustomVoiceTextPlaceholder')}
+            placeholder={'試聴したいテキストを入力してください'}
             value={customVoiceText}
             onChange={(e) => setCustomVoiceText(e.target.value)}
           />
@@ -1288,7 +1307,7 @@ const Voice = () => {
             onClick={() => testVoice(selectVoice, customVoiceText)}
             disabled={!customVoiceText}
           >
-            {t('TestSelectedVoice')}
+            {'再生する'}
           </TextButton>
         </div>
       </div>

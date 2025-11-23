@@ -12,21 +12,31 @@ export const useAudioProcessing = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
 
-  // AudioContextの初期化
+  // AudioContextの初期化（マウント時に1回のみ）
   useEffect(() => {
     const AudioContextClass = (window.AudioContext ||
       (window as any).webkitAudioContext) as AudioContextType
     const context = new AudioContextClass()
+
+    // ユーザー操作後にresumeする（警告を防ぐため）
+    const resumeContext = () => {
+      if (context.state === 'suspended') {
+        context.resume().catch(console.error)
+      }
+    }
+
+    // 最初のクリックでAudioContextをresumeする
+    document.addEventListener('click', resumeContext, { once: true })
+
     setAudioContext(context)
 
     // クリーンアップ関数
     return () => {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop()
-      }
+      document.removeEventListener('click', resumeContext)
       context.close().catch(console.error)
     }
-  }, [mediaRecorder])
+    // 依存配列を空にして、マウント時のみ実行
+  }, [])
 
   /**
    * マイク権限を確認する関数

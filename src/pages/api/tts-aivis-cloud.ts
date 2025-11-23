@@ -61,44 +61,92 @@ export default async function handler(
     // スタイルを指定しない場合は、requestBodyにフィールドを追加しない
     // （APIがデフォルトスタイルを使用する）
 
-    console.log('AIVIS Cloud TTS Request:', JSON.stringify(requestBody, null, 2))
+    console.log(
+      'AIVIS Cloud TTS Request:',
+      JSON.stringify(requestBody, null, 2)
+    )
 
-    const response = await axios.post(apiUrl, requestBody, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        Accept: 'audio/wav',
-      },
-      responseType: 'arraybuffer',
-      timeout: 30000,
-    })
+    // 再試行ロジック（最大3回）
+    let lastError: any
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await axios.post(apiUrl, requestBody, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+            Accept: 'audio/wav',
+          },
+          responseType: 'arraybuffer',
+          timeout: 10000, // 10秒に短縮（元は30秒）
+        })
 
-    res.setHeader('Content-Type', 'audio/wav')
-    res.send(response.data)
+        res.setHeader('Content-Type', 'audio/wav')
+        return res.send(response.data)
+      } catch (err) {
+        lastError = err
+        if (axios.isAxiosError(err) && err.response?.status === 503 && attempt < 3) {
+          console.log(`AIVIS Cloud 503 error, retrying... (attempt ${attempt + 1}/3)`)
+          // 再試行間隔を短縮（500ms, 1000ms）
+          await new Promise(resolve => setTimeout(resolve, 500 * attempt))
+          continue
+        }
+        throw err
+      }
+    }
   } catch (error) {
     console.error('Error in AIVIS Cloud TTS:', error)
-    if (axios.isAxiosError(error) && error.response) {
-      console.error('Response data:', error.response.data)
-      console.error('Response status:', error.response.status)
-      
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.error('Response data (raw):', error.response.data)
+        // バッファをデコード
+        if (Buffer.isBuffer(error.response.data)) {
+          const decoded = error.response.data.toString('utf-8')
+          console.error('Response data (decoded):', decoded)
+        }
+        console.error('Response status:', error.response.status)
+        console.error('Response headers:', error.response.headers)
+      } else if (error.request) {
+        console.error('No response received:', error.request)
+      }
+      console.error('Error config:', error.config)
+
       // エラーの詳細をクライアントに返す
       let errorMessage = 'Failed to generate speech with AIVIS Cloud API'
-      if (error.response.status === 404) {
-        errorMessage = 'Model or style not found. Please check your Model UUID and Style settings.'
-      } else if (error.response.status === 401 || error.response.status === 403) {
-        errorMessage = 'Invalid API key. Please check your AIVIS Cloud API Key.'
-      } else if (error.response.data) {
-        try {
-          const errorData = JSON.parse(error.response.data.toString())
-          if (errorData.detail) {
-            errorMessage = `AIVIS Cloud API error: ${errorData.detail}`
+      let statusCode = 500
+
+      if (error.response) {
+        statusCode = error.response.status
+        if (error.response.status === 404) {
+          errorMessage =
+            'Model or style not found. Please check your Model UUID and Style settings.'
+        } else if (
+          error.response.status === 401 ||
+          error.response.status === 403
+        ) {
+          errorMessage = 'Invalid API key. Please check your AIVIS Cloud API Key.'
+        } else if (error.response.data) {
+          try {
+            let dataString = ''
+            if (Buffer.isBuffer(error.response.data)) {
+              dataString = error.response.data.toString('utf-8')
+            } else {
+              dataString = error.response.data.toString()
+            }
+            const errorData = JSON.parse(dataString)
+            if (errorData.detail) {
+              errorMessage = `AIVIS Cloud API error: ${errorData.detail}`
+            }
+          } catch (e) {
+            console.error('Failed to parse error response:', e)
           }
-        } catch (e) {
-          // データのパースに失敗した場合は元のメッセージを使用
         }
+      } else if (error.request) {
+        errorMessage = 'No response from AIVIS Cloud API. Please check your network connection.'
+      } else {
+        errorMessage = `Request setup error: ${error.message}`
       }
-      
-      return res.status(error.response.status).json({ error: errorMessage })
+
+      return res.status(statusCode).json({ error: errorMessage })
     }
     res.status(500).json({ error: 'Internal Server Error' })
   }

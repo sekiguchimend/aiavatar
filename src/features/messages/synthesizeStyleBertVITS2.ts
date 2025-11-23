@@ -1,5 +1,4 @@
 import { Talk } from './messages'
-import { Language } from '@/features/constants/settings'
 
 export async function synthesizeStyleBertVITS2Api(
   talk: Talk,
@@ -9,7 +8,7 @@ export async function synthesizeStyleBertVITS2Api(
   stylebertvits2Style: string,
   stylebertvits2SdpRatio: number,
   stylebertvits2Length: number,
-  selectLanguage: Language
+  selectLanguage: string
 ) {
   try {
     const body = {

@@ -29,7 +29,6 @@ jest.mock('../../../features/stores/settings', () => ({
   getState: jest.fn(),
 }))
 
-
 jest.mock('../../../features/stores/websocketStore', () => ({
   getState: jest.fn(),
 }))

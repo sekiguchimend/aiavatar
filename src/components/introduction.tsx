@@ -1,33 +1,18 @@
-import i18n from 'i18next'
 import { useEffect, useState } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
 
 import homeStore from '@/features/stores/home'
-import settingsStore from '@/features/stores/settings'
 import { IconButton } from './iconButton'
 import { Link } from './link'
-import { isLanguageSupported } from '@/features/constants/settings'
 
 export const Introduction = () => {
   const showIntroduction = homeStore((s) => s.showIntroduction)
-  const selectLanguage = settingsStore((s) => s.selectLanguage)
 
   const [displayIntroduction, setDisplayIntroduction] = useState(false)
   const [opened, setOpened] = useState(true)
 
-  const { t } = useTranslation()
-
   useEffect(() => {
     setDisplayIntroduction(homeStore.getState().showIntroduction)
   }, [showIntroduction])
-
-  const updateLanguage = () => {
-    let languageCode = i18n.language
-
-    settingsStore.setState({
-      selectLanguage: isLanguageSupported(languageCode) ? languageCode : 'ja',
-    })
-  }
 
   return displayIntroduction && opened ? (
     <div className="absolute z-40 w-full h-full px-6 py-10 bg-black/30 font-M_PLUS_2">
@@ -38,65 +23,59 @@ export const Introduction = () => {
             isProcessing={false}
             onClick={() => {
               setOpened(false)
-              updateLanguage()
             }}
             className="bg-secondary hover:bg-secondary-hover active:bg-secondary-press disabled:bg-secondary-disabled text-white"
           ></IconButton>
         </div>
         <div className="mb-6">
           <div className="mb-2 font-bold text-xl text-secondary ">
-            {t('AboutThisApplication')}
+            このアプリケーションについて
           </div>
           <div>
-            <Trans i18nKey="AboutThisApplicationDescription2" />
+            アバターデモでは、WebブラウザだけでAIキャラクターとの会話を楽しめます。キャラクターの変更や性格設定、音声調整は各設定項目を確認してください。
           </div>
         </div>
         <div className="my-6">
-          <div className="my-2 font-bold text-xl text-secondary">
-            {t('TechnologyIntroduction')}
-          </div>
+          <div className="my-2 font-bold text-xl text-secondary">技術紹介</div>
           <div>
-            <Trans
-              i18nKey="TechnologyIntroductionDescription1"
-              components={{ b: <b /> }}
-            />
-            <Link
-              url={'https://github.com/pixiv/ChatVRM'}
-              label={t('TechnologyIntroductionLink1')}
-            />
-            {t('TechnologyIntroductionDescription2')}
+            このアプリはpixiv社の<b>ChatVRM</b>
+            を改造して作成されています。元のソースコードは
+            <Link url={'https://github.com/pixiv/ChatVRM'} label="こちら" />
+            をご覧ください。
           </div>
           <div className="my-4">
-            {t('TechnologyIntroductionDescription3')}
+            3Dモデルの表示や操作には
             <Link
               url={'https://github.com/pixiv/three-vrm'}
               label={'@pixiv/three-vrm'}
             />
-            {t('TechnologyIntroductionDescription4')}
+            、 会話文生成には
             <Link
               url={
                 'https://openai.com/blog/introducing-chatgpt-and-whisper-apis'
               }
               label={'OpenAI API'}
             />
-            {t('TechnologyIntroductionDescription5')}
+            などの各種LLM、 音声合成には
             <Link
               url={
                 'https://developers.rinna.co.jp/product/#product=koeiromap-free'
               }
               label={'Koemotion'}
             />
-            {t('TechnologyIntroductionDescription6')}
+            などの各種TTSを使用しています。 詳細はこちらの
             <Link
               url={'https://note.com/nike_cha_n/n/ne98acb25e00f'}
-              label={t('TechnologyIntroductionLink2')}
+              label="解説記事"
             />
-            {t('TechnologyIntroductionDescription7')}
+            をご覧ください。
           </div>
           <div className="my-4">
-            {t('SourceCodeDescription1')}
+            このアプリのソースコードはGitHubで公開しています。自由に変更や改変可能です。
           </div>
-          <div className="my-4">{t('SourceCodeDescription2')}</div>
+          <div className="my-4">
+            商用利用に関しては、同リポジトリのREADMEをご覧ください。
+          </div>
         </div>
 
         <div className="my-6">
@@ -108,11 +87,10 @@ export const Introduction = () => {
                 homeStore.setState({
                   showIntroduction: e.target.checked,
                 })
-                updateLanguage()
               }}
               className="mr-2"
             />
-            <span>{t('DontShowIntroductionNextTime')}</span>
+            <span>次回からこのダイアログを表示しない</span>
           </label>
         </div>
 
@@ -120,22 +98,12 @@ export const Introduction = () => {
           <button
             onClick={() => {
               setOpened(false)
-              updateLanguage()
             }}
             className="font-bold bg-secondary hover:bg-secondary-hover active:bg-secondary-press disabled:bg-secondary-disabled text-white px-6 py-2 rounded-full"
           >
-            {t('Close')}
+            閉じる
           </button>
         </div>
-
-        {selectLanguage === 'ja' && (
-          <div className="mt-6">
-            <p>
-              You can select the language from the settings. Japanese, English,
-              Traditional Chinese and Korean are available.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   ) : null

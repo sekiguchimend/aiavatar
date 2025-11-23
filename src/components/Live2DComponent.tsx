@@ -46,7 +46,7 @@ const Live2DComponent = () => {
   }, [])
 
   useEffect(() => {
-    if (app && selectedLive2DPath) {
+    if (app && selectedLive2DPath && selectedLive2DPath.trim() !== '') {
       // 既存のモデルがある場合は先に削除
       if (modelRef.current) {
         app.stage.removeChild(modelRef.current as unknown as DisplayObject)

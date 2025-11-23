@@ -5,13 +5,10 @@ import dynamic from 'next/dynamic'
 import Script from 'next/script'
 import homeStore from '@/features/stores/home'
 
-const Live2DComponent = dynamic(
-  () => import('./Live2DComponent'),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-)
+const Live2DComponent = dynamic(() => import('./Live2DComponent'), {
+  ssr: false,
+  loading: () => null,
+})
 
 export default function Live2DViewer() {
   const [isMounted, setIsMounted] = useState(false)
@@ -53,7 +50,8 @@ export default function Live2DViewer() {
         onError={() => {
           if (typeof window !== 'undefined') {
             const cdnScript = document.createElement('script')
-            cdnScript.src = 'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js'
+            cdnScript.src =
+              'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js'
             cdnScript.async = true
             cdnScript.onload = () => {
               setIsCubismCoreLoaded(true)

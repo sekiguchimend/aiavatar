@@ -1,10 +1,8 @@
-import { useTranslation } from 'react-i18next'
 import settingsStore from '@/features/stores/settings'
 import { TextButton } from '../textButton'
 import { useCallback } from 'react'
 
 const ExternalLinkage = () => {
-  const { t } = useTranslation()
   const externalLinkageMode = settingsStore((s) => s.externalLinkageMode)
 
   const handleExternalLinkageModeChange = useCallback((newMode: boolean) => {
@@ -22,14 +20,14 @@ const ExternalLinkage = () => {
 
   return (
     <div className="mb-10">
-      <div className="mb-4 text-xl font-bold">{t('ExternalLinkageMode')}</div>
+      <div className="mb-4 text-xl font-bold">{'外部連携モード(ベータ版)'}</div>
       <div className="my-2">
         <TextButton
           onClick={() => {
             handleExternalLinkageModeChange(!externalLinkageMode)
           }}
         >
-          {externalLinkageMode ? t('StatusOn') : t('StatusOff')}
+          {externalLinkageMode ? '状態:ON' : '状態:OFF'}
         </TextButton>
       </div>
     </div>

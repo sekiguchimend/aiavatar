@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import settingsStore from '@/features/stores/settings'
 import { speakCharacter } from '@/features/messages/speakCharacter'
 import homeStore from '@/features/stores/home'
@@ -13,7 +12,6 @@ type QuestionItem = {
 }
 
 const TestAnswerUpload = () => {
-  const { t } = useTranslation()
   const [file, setFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isExplaining, setIsExplaining] = useState(false)
@@ -61,19 +59,19 @@ const TestAnswerUpload = () => {
       if (response.ok) {
         setUploadResult({
           success: true,
-          message: t('AnalysisCompleted'),
+          message: '分析完了',
           analysis: result.analysis,
         })
       } else {
         setUploadResult({
           success: false,
-          message: result.error || t('UploadFailed'),
+          message: result.error || 'アップロード失敗',
         })
       }
     } catch (error) {
       setUploadResult({
         success: false,
-        message: t('UploadFailed'),
+        message: 'アップロード失敗',
       })
     } finally {
       setIsUploading(false)
@@ -82,14 +80,16 @@ const TestAnswerUpload = () => {
 
   return (
     <div className="mb-8 p-4 bg-white bg-opacity-50 rounded-lg">
-      <h3 className="text-lg font-medium mb-4">{t('TestAnswerUpload')}</h3>
+      <h3 className="text-lg font-medium mb-4">{'テスト答案アップロード'}</h3>
       <p className="mb-4 text-sm text-gray-600">
-        {t('TestAnswerUploadDescription')}
+        {
+          'テスト答案をアップロードして理解度と習熟度を分析します。システムはOCRを使用して不正解の箇所を特定し、詳細な分析を提供します。'
+        }
       </p>
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          {t('SelectTestAnswerFile')}
+          {'テスト答案ファイルを選択'}
         </label>
         <input
           type="file"
@@ -113,7 +113,7 @@ const TestAnswerUpload = () => {
             : 'bg-primary hover:bg-primary-dark'
         }`}
       >
-        {isUploading ? t('Uploading') : t('UploadAndAnalyze')}
+        {isUploading ? 'アップロード中...' : 'アップロードして分析'}
       </button>
 
       {uploadResult && (
@@ -132,12 +132,11 @@ const TestAnswerUpload = () => {
           {uploadResult.success && uploadResult.analysis && (
             <div className="mt-2">
               <p className="text-sm text-gray-700">
-                {t('IncorrectAnswers')}:{' '}
-                {uploadResult.analysis.incorrectAnswers} /{' '}
+                {'不正解数'}: {uploadResult.analysis.incorrectAnswers} /{' '}
                 {uploadResult.analysis.totalAnswers}
               </p>
               <p className="text-sm text-gray-700">
-                {t('ProficiencyScore')}:{' '}
+                {'習熟度スコア'}:{' '}
                 {uploadResult.analysis.proficiencyScore.toFixed(1)}%
               </p>
 
@@ -185,7 +184,7 @@ const TestAnswerUpload = () => {
                                               0,
                                               20
                                             ) + '...'
-                                          : t('IncorrectReason')}
+                                          : '不正解の理由と解説があります'}
                                       </span>
                                       <button
                                         onClick={() => handleExplain(question)}
@@ -198,7 +197,7 @@ const TestAnswerUpload = () => {
                                               : 'bg-red-500 hover:bg-red-600 text-white'
                                         }`}
                                       >
-                                        {t('ExplanationButton')}
+                                        {'解説'}
                                       </button>
                                     </div>
                                   ) : (
@@ -268,18 +267,17 @@ const TestAnswerUpload = () => {
       {currentExplanation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-medium mb-4">
-              {t('AvatarExplanation')}
-            </h3>
+            <h3 className="text-lg font-medium mb-4">{'AIアバター解説'}</h3>
             <div className="whitespace-pre-line mb-4">
               <div className="bg-gray-100 p-3 rounded-lg mb-3 border-l-4 border-blue-500">
-                <p className="font-medium text-blue-800 mb-1">
-                  {t('ExplanationTitle')}
-                </p>
+                <p className="font-medium text-blue-800 mb-1">{'解説:'}</p>
                 <p>{currentExplanation}</p>
               </div>
               <div className="text-sm text-gray-600 mt-2">
-                <p>{t('ExplanationNote')}</p>
+                <p>
+                  ※
+                  AIアバターが解説を読み上げています。聞き取りにくい場合は上記のテキストをご参照ください。
+                </p>
               </div>
             </div>
             <div className="flex justify-end">
@@ -287,7 +285,7 @@ const TestAnswerUpload = () => {
                 onClick={() => setCurrentExplanation(null)}
                 className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium"
               >
-                {t('CloseButton')}
+                {'閉じる'}
               </button>
             </div>
           </div>
@@ -310,11 +308,11 @@ const TestAnswerUpload = () => {
     const emotion = question.isCorrect ? 'happy' : 'sad'
 
     // 解説メッセージを作成
-    let message = t('ExplanationIntro', { number: question.questionNumber })
+    let message = `問題${question.questionNumber}の解説です。`
 
     // 不正解の場合は特別なメッセージを追加
     if (!question.isCorrect) {
-      message += t('IncorrectExplanationIntro') + question.explanation
+      message += 'この問題は不正解でした。' + question.explanation
     } else {
       message += question.explanation
     }

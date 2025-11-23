@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import settingsStore from '@/features/stores/settings'
 import { TextButton } from '../textButton'
 import Image from 'next/image'
@@ -20,11 +19,7 @@ const SpeechInput = () => {
   )
   const initialSpeechTimeout = settingsStore((s) => s.initialSpeechTimeout)
   const realtimeAPIMode = settingsStore((s) => s.realtimeAPIMode)
-  const audioMode = settingsStore((s) => s.audioMode)
-
-  const { t } = useTranslation()
-
-  // whisperモードの場合、自動的にnoSpeechTimeoutを0に、showSilenceProgressBarをfalseに設定
+  const audioMode = settingsStore((s) => s.audioMode) // whisperモードの場合、自動的にnoSpeechTimeoutを0に、showSilenceProgressBarをfalseに設定
   useEffect(() => {
     if (speechRecognitionMode === 'whisper') {
       settingsStore.setState({
@@ -64,18 +59,19 @@ const SpeechInput = () => {
           height={24}
           className="mr-2"
         />
-        <h2 className="text-2xl font-bold">{t('SpeechInputSettings')}</h2>
+        <h2 className="text-2xl font-bold">{'音声入力設定'}</h2>
       </div>
       <div className="my-6">
-        <div className="my-4 text-xl font-bold">
-          {t('SpeechRecognitionMode')}
-        </div>
+        <div className="my-4 text-xl font-bold">{'音声認識モード'}</div>
         <div className="my-4 text-base whitespace-pre-line">
-          {t('SpeechRecognitionModeInfo')}
+          {`音声認識モードを選択できます。
+「ブラウザ標準」はブラウザ内蔵の音声認識を使用します。「OpenAI TTS」はOpenAIのText to Speech APIを使用します。
+一般的には「ブラウザ標準」の方が精度が高く、認識速度も速いため推奨されます。ただし、FirefoxなどWebSpeech APIに対応していないブラウザを使用している場合は、「OpenAI TTS」を選択してください。`}
         </div>
         {isSpeechModeSwitchDisabled && (
           <div className="my-4 text-sm text-orange-500 whitespace-pre-line">
-            {t('SpeechRecognitionModeDisabledInfo')}
+            {`オーディオモードが有効な場合、ブラウザ音声認識のみが使用可能です。
+また、リアルタイムAPIモードではブラウザ音声認識のみが使用可能な上、音声認識タイムアウト機能が無効になります。`}
           </div>
         )}
         <div className="mt-2">
@@ -89,19 +85,19 @@ const SpeechInput = () => {
             disabled={isSpeechModeSwitchDisabled}
           >
             {speechRecognitionMode === 'browser'
-              ? t('BrowserSpeechRecognition')
-              : t('WhisperSpeechRecognition')}
+              ? 'ブラウザ標準の音声認識を使用'
+              : 'OpenAI TTS音声認識を使用'}
           </TextButton>
         </div>
       </div>
       {speechRecognitionMode === 'whisper' && (
         <>
           <div className="my-6">
-            <div className="my-4 text-xl font-bold">
-              {t('OpenAIAPIKeyLabel')}
-            </div>
+            <div className="my-4 text-xl font-bold">{'OpenAI API キー'}</div>
             <div className="my-4">
-              {t('APIKeyInstruction')}
+              {
+                'APIキーは下記のリンクから取得できます。取得したAPIキーをフォームに入力してください。'
+              }
               <br />
               <Link
                 url="https://platform.openai.com/account/api-keys"
@@ -119,11 +115,11 @@ const SpeechInput = () => {
             />
           </div>
           <div className="mt-6">
-            <div className="mb-4 text-xl font-bold">
-              {t('WhisperTranscriptionModel')}
-            </div>
+            <div className="mb-4 text-xl font-bold">{'文字起こしモデル'}</div>
             <div className="mb-4 text-base whitespace-pre-line">
-              {t('WhisperTranscriptionModelInfo')}
+              {
+                '音声認識に使用するモデルを選択できます。より高性能なモデルほど高精度で認識可能ですが、APIコストが高くなる場合があります。'
+              }
             </div>
             <select
               id="whisper-model-select"
@@ -149,14 +145,15 @@ const SpeechInput = () => {
         <>
           <div className="my-6">
             <div className="my-4 text-xl font-bold">
-              {t('InitialSpeechTimeout')}
+              {'音声認識タイムアウト'}
             </div>
             <div className="my-4 text-base whitespace-pre-line">
-              {t('InitialSpeechTimeoutInfo')}
+              {`音声認識開始後、最初の発話が検出されるまでの待機時間を設定します。この時間内に発話が検出されない場合、音声認識は自動的に停止します。
+0秒に設定すると、待機時間は無制限になります。`}
             </div>
             <div className="mt-6 font-bold">
               <div className="select-none">
-                {t('InitialSpeechTimeout')}: {initialSpeechTimeout.toFixed(1)}秒
+                {'音声認識タイムアウト'}: {initialSpeechTimeout.toFixed(1)}秒
               </div>
               <input
                 type="range"
@@ -174,13 +171,16 @@ const SpeechInput = () => {
             </div>
           </div>
           <div className="my-6">
-            <div className="my-4 text-xl font-bold">{t('NoSpeechTimeout')}</div>
+            <div className="my-4 text-xl font-bold">
+              {'無音検出タイムアウト'}
+            </div>
             <div className="my-4 text-base whitespace-pre-line">
-              {t('NoSpeechTimeoutInfo')}
+              {`音声入力時に無音状態が続いた場合、自動的に入力を終了するまでの時間を設定します。
+0秒に設定すると、無音検出による自動送信を無効にします。`}
             </div>
             <div className="mt-6 font-bold">
               <div className="select-none">
-                {t('NoSpeechTimeout')}: {noSpeechTimeout.toFixed(1)}秒
+                {'無音検出タイムアウト'}: {noSpeechTimeout.toFixed(1)}秒
               </div>
               <input
                 type="range"
@@ -198,7 +198,7 @@ const SpeechInput = () => {
             </div>
             <div className="mt-6">
               <div className="font-bold mb-2">
-                {t('ShowSilenceProgressBar')}
+                {'無音検出プログレスバーを表示'}
               </div>
               <TextButton
                 onClick={() =>
@@ -207,14 +207,15 @@ const SpeechInput = () => {
                   })
                 }
               >
-                {showSilenceProgressBar ? t('StatusOn') : t('StatusOff')}
+                {showSilenceProgressBar ? '状態:ON' : '状態:OFF'}
               </TextButton>
             </div>
           </div>
           <div className="my-6">
-            <div className="my-4 text-xl font-bold">{t('ContinuousMic')}</div>
+            <div className="my-4 text-xl font-bold">{'常時マイク入力'}</div>
             <div className="my-4 text-base whitespace-pre-line">
-              {t('ContinuousMicInfo')}
+              {`AIの発話が終了したタイミングで自動的にマイク入力を再開します。設定された無音時間経過後に自動的に送信します。
+音声認識がされないまま設定時間を超えると、自動的に常時マイク入力はOFFになるため、常にONにしておきたい場合は音声認識タイムアウトを0秒に設定してください。`}
             </div>
             <TextButton
               onClick={() =>
@@ -223,7 +224,7 @@ const SpeechInput = () => {
                 })
               }
             >
-              {continuousMicListeningMode ? t('StatusOn') : t('StatusOff')}
+              {continuousMicListeningMode ? '状態:ON' : '状態:OFF'}
             </TextButton>
           </div>
         </>

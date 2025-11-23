@@ -20,10 +20,7 @@ export default function Document() {
           href="/scripts/live2dcubismcore.min.js"
           as="script"
         />
-        <link
-          rel="dns-prefetch"
-          href="https://cubism.live2d.com"
-        />
+        <link rel="dns-prefetch" href="https://cubism.live2d.com" />
       </Head>
       <body>
         <Main />

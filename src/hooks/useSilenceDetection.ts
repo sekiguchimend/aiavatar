@@ -1,8 +1,6 @@
 import { useState, useCallback, useRef, MutableRefObject } from 'react'
 import settingsStore from '@/features/stores/settings'
 import toastStore from '@/features/stores/toast'
-import { useTranslation } from 'react-i18next'
-
 type UseSilenceDetectionProps = {
   onTextDetected: (text: string) => void
   transcriptRef: MutableRefObject<string>
@@ -19,10 +17,7 @@ export const useSilenceDetection = ({
   // 無音タイムアウト残り時間のステート
   const [silenceTimeoutRemaining, setSilenceTimeoutRemaining] = useState<
     number | null
-  >(null)
-  const { t } = useTranslation()
-
-  // 無音検出用の追加変数
+  >(null) // 無音検出用の追加変数
   const lastSpeechTimestamp = useRef<number>(0)
   const silenceCheckInterval = useRef<NodeJS.Timeout | null>(null)
   const speechEndedRef = useRef<boolean>(false)
@@ -116,7 +111,7 @@ export const useSilenceDetection = ({
 
           // トースト通知を表示
           toastStore.getState().addToast({
-            message: t('Toasts.NoSpeechDetected'),
+            message: '音声が検出されませんでした。',
             type: 'info',
             tag: 'no-speech-detected-long-silence',
           })
@@ -171,7 +166,7 @@ export const useSilenceDetection = ({
         }
       }, 100) // 100msごとにチェック
     },
-    [onTextDetected, setUserMessage, speechDetectedRef, t]
+    [onTextDetected, setUserMessage, speechDetectedRef]
   )
 
   // 音声検出時刻を更新する関数

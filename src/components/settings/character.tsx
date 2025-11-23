@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 
 import homeStore from '@/features/stores/home'
@@ -104,7 +103,6 @@ type EmotionFieldKey = (typeof emotionFields)[number]['key']
 
 const Live2DSettingsForm = () => {
   const store = settingsStore()
-  const { t } = useTranslation()
   const [currentModel, setCurrentModel] = useState<Live2DModel | null>(null)
   const [openDropdown, setOpenDropdown] = useState<EmotionFieldKey | null>(null)
 
@@ -173,7 +171,7 @@ const Live2DSettingsForm = () => {
   if (!currentModel) {
     return (
       <div className="flex items-center justify-center h-32 text-gray-500">
-        {t('Live2D.LoadingModel')}
+        モデル読み込み中...
       </div>
     )
   }
@@ -181,158 +179,187 @@ const Live2DSettingsForm = () => {
   return (
     <div className="space-y-8">
       <div className="mb-6">
-        <div className="mb-4 text-xl font-bold">{t('Live2D.Emotions')}</div>
+        <div className="mb-4 text-xl font-bold">{'表情設定'}</div>
         <div className="mb-6 text-base whitespace-pre-line">
-          {t('Live2D.EmotionInfo')}
+          {`感情はカンマ区切りで複数指定できます。複数指定した場合はランダムに選択されます。
+初期値はアバターデモで用意しているモデルに対応したものです。オリジナルのモデルを使用する場合はご自身のモデルに合わせた値を入力してください。
+会話完了後は「通常」の表情が表示されます。`}
         </div>
         <div className="space-y-4 text-sm">
-          {emotionFields.map((field) => (
-            <div key={field.key}>
-              <label className="block mb-2 text-base font-bold">
-                {t(`Live2D.${field.key}`)}
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  className="w-full px-2 py-2 bg-white hover:bg-white-hover rounded-lg text-left flex items-center justify-between"
-                  onClick={() =>
-                    setOpenDropdown(
-                      openDropdown === field.key ? null : field.key
-                    )
-                  }
-                >
-                  <div className="flex flex-wrap gap-1">
-                    {store[field.key].length > 0 ? (
-                      store[field.key].map((expression) => (
-                        <span
-                          key={expression}
-                          className="inline-flex items-center px-2 py-1 bg-primary/10 rounded-lg mr-1"
-                        >
-                          {expression}
-                          <button
-                            type="button"
-                            className="ml-4 text-gray-500 hover:text-gray-700"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleEmotionChange(field.key, expression, false)
-                            }}
-                          >
-                            <svg
-                              className="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </span>
-                      ))
-                    ) : (
-                      <span className="">{t('Live2D.SelectEmotions')}</span>
-                    )}
-                  </div>
-                  <svg
-                    className={`h-4 w-4  transition-transform ${
-                      openDropdown === field.key ? 'rotate-180' : ''
-                    }`}
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
+          {emotionFields.map((field) => {
+            const emotionLabels: { [key: string]: string } = {
+              neutralEmotions: '通常',
+              happyEmotions: '嬉しい',
+              sadEmotions: '悲しい',
+              angryEmotions: '怒り',
+              relaxedEmotions: 'リラックス',
+              surprisedEmotions: '驚き',
+            }
+            return (
+              <div key={field.key}>
+                <label className="block mb-2 text-base font-bold">
+                  {emotionLabels[field.key]}
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="w-full px-2 py-2 bg-white hover:bg-white-hover rounded-lg text-left flex items-center justify-between"
+                    onClick={() =>
+                      setOpenDropdown(
+                        openDropdown === field.key ? null : field.key
+                      )
+                    }
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2 5l6 6 6-6"
-                    />
-                  </svg>
-                </button>
-                {openDropdown === field.key && (
-                  <div className="absolute z-10 w-full mt-4 max-h-[200px] overflow-y-auto bg-white rounded-lg shadow-lg border-gray-200 divide-y divide-gray-200">
-                    {currentModel.expressions.map((expression) => (
-                      <label
-                        key={expression}
-                        className="flex items-center px-4 py-2 hover:bg-white-hover cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary mr-2"
-                          checked={store[field.key].includes(expression)}
-                          onChange={(e) =>
-                            handleEmotionChange(
-                              field.key,
-                              expression,
-                              e.target.checked
-                            )
-                          }
-                        />
-                        <span className="text-base">{expression}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+                    <div className="flex flex-wrap gap-1">
+                      {store[field.key].length > 0 ? (
+                        store[field.key].map((expression) => (
+                          <span
+                            key={expression}
+                            className="inline-flex items-center px-2 py-1 bg-primary/10 rounded-lg mr-1"
+                          >
+                            {expression}
+                            <button
+                              type="button"
+                              className="ml-4 text-gray-500 hover:text-gray-700"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEmotionChange(
+                                  field.key,
+                                  expression,
+                                  false
+                                )
+                              }}
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="">表情を選択</span>
+                      )}
+                    </div>
+                    <svg
+                      className={`h-4 w-4  transition-transform ${
+                        openDropdown === field.key ? 'rotate-180' : ''
+                      }`}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M2 5l6 6 6-6"
+                      />
+                    </svg>
+                  </button>
+                  {openDropdown === field.key && (
+                    <div className="absolute z-10 w-full mt-4 max-h-[200px] overflow-y-auto bg-white rounded-lg shadow-lg border-gray-200 divide-y divide-gray-200">
+                      {currentModel.expressions.map((expression) => (
+                        <label
+                          key={expression}
+                          className="flex items-center px-4 py-2 hover:bg-white-hover cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary mr-2"
+                            checked={store[field.key].includes(expression)}
+                            onChange={(e) =>
+                              handleEmotionChange(
+                                field.key,
+                                expression,
+                                e.target.checked
+                              )
+                            }
+                          />
+                          <span className="text-base">{expression}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
       <div className="">
-        <div className="mb-4 text-xl font-bold">{t('Live2D.MotionGroups')}</div>
+        <div className="mb-4 text-xl font-bold">{'モーショングループ設定'}</div>
         <div className="mb-6 text-base text-gray-500 whitespace-pre-line">
-          {t('Live2D.MotionGroupsInfo')}
+          {`モーショングループは選択したグループからランダムに選択されます。
+表情設定と同じく、ご自身のモデルに合わせて設定してください。
+「アイドル時」は会話完了後に表示されるモーションです。`}
         </div>
         <div className="space-y-4">
-          {motionFields.map((field) => (
-            <div key={field.key}>
-              <label className="block mb-2 text-base font-bold">
-                {t(`Live2D.${field.key}`)}
-              </label>
-              <div className="relative">
-                <select
-                  className="w-full px-4 py-2 bg-white hover:bg-white-hover rounded-lg appearance-none cursor-pointer"
-                  value={store[field.key]}
-                  onChange={(e) =>
-                    handleMotionChange(field.key, e.target.value)
-                  }
-                >
-                  <option value="" className="">
-                    {t('Live2D.SelectMotionGroup')}
-                  </option>
-                  {currentModel.motions.map((motion) => (
-                    <option
-                      key={motion}
-                      value={motion}
-                      className="py-4 px-8 hover:bg-primary hover:text-white"
-                    >
-                      {motion}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-16 flex items-center pointer-events-none">
-                  <svg
-                    className="h-4 w-4 "
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
+          {motionFields.map((field) => {
+            const motionLabels: { [key: string]: string } = {
+              idleMotionGroup: 'アイドル時',
+              neutralMotionGroup: '通常',
+              happyMotionGroup: '嬉しい',
+              sadMotionGroup: '悲しい',
+              angryMotionGroup: '怒り',
+              relaxedMotionGroup: 'リラックス',
+              surprisedMotionGroup: '驚き',
+            }
+            return (
+              <div key={field.key}>
+                <label className="block mb-2 text-base font-bold">
+                  {motionLabels[field.key]}
+                </label>
+                <div className="relative">
+                  <select
+                    className="w-full px-4 py-2 bg-white hover:bg-white-hover rounded-lg appearance-none cursor-pointer"
+                    value={store[field.key]}
+                    onChange={(e) =>
+                      handleMotionChange(field.key, e.target.value)
+                    }
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2 5l6 6 6-6"
-                    />
-                  </svg>
+                    <option value="" className="">
+                      {'モーショングループを選択'}
+                    </option>
+                    {currentModel.motions.map((motion) => (
+                      <option
+                        key={motion}
+                        value={motion}
+                        className="py-4 px-8 hover:bg-primary hover:text-white"
+                      >
+                        {motion}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-16 flex items-center pointer-events-none">
+                    <svg
+                      className="h-4 w-4 "
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M2 5l6 6 6-6"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>
@@ -340,14 +367,12 @@ const Live2DSettingsForm = () => {
 }
 
 const Character = () => {
-  const { t } = useTranslation()
   const { characterName, selectedVrmPath, selectedLive2DPath, modelType } =
     settingsStore()
   const [vrmFiles, setVrmFiles] = useState<string[]>([])
   const [live2dModels, setLive2dModels] = useState<
     Array<{ path: string; name: string }>
   >([])
-  const selectAIService = settingsStore((s) => s.selectAIService)
   const systemPrompt = settingsStore((s) => s.systemPrompt)
   const characterPresets = [
     {
@@ -453,14 +478,14 @@ const Character = () => {
           height={24}
           className="mr-2"
         />
-        <h2 className="text-2xl font-bold">{t('CharacterSettings')}</h2>
+        <h2 className="text-2xl font-bold">{'キャラクター設定'}</h2>
       </div>
       <div className="">
-        <div className="mb-4 text-xl font-bold">{t('CharacterName')}</div>
+        <div className="mb-4 text-xl font-bold">{'キャラクター名'}</div>
         <input
           className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg"
           type="text"
-          placeholder={t('CharacterName')}
+          placeholder={'キャラクター名'}
           value={characterName}
           onChange={(e) =>
             settingsStore.setState({ characterName: e.target.value })
@@ -468,9 +493,13 @@ const Character = () => {
         />
 
         <div className="mt-6 mb-4 text-xl font-bold">
-          {t('CharacterModelLabel')}
+          {'キャラクターモデル'}
         </div>
-        <div className="mb-4 text-base">{t('CharacterModelInfo')}</div>
+        <div className="mb-4 text-base">
+          {
+            'モデルによっては初期表示時の読み込みに時間がかかる可能性があります。'
+          }
+        </div>
 
         <div className="flex mb-2">
           <button
@@ -530,14 +559,15 @@ const Character = () => {
                   }
                 }}
               >
-                {t('OpenVRM')}
+                {'VRMを開く'}
               </TextButton>
             </div>
           </>
         ) : (
           <>
             <div className="my-4 whitespace-pre-line">
-              {t('Live2D.FileInfo')}
+              {`使用したいLive2Dモデルのフォルダを、public/live2d に配置してください。このフォルダの直下にmodel3.jsonファイルが存在する必要があります。
+選択肢に表示されない場合は、画面を再読込するかフォルダのパスが正しいか確認してください。`}
             </div>
             <select
               className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg mb-2"
@@ -561,18 +591,16 @@ const Character = () => {
 
         <div className="my-6 mb-2">
           <div className="my-4 text-xl font-bold">
-            {t('CharacterSettingsPrompt')}
+            {'キャラクタープロンプト'}
           </div>
-          {selectAIService === 'dify' ? (
-            <div className="my-4">{t('DifyInstruction')}</div>
-          ) : (
-            <div className="my-4 whitespace-pre-line">
-              {t('CharacterSettingsInfo')}
-            </div>
-          )}
+          <div className="my-4 whitespace-pre-line">
+            {`この値はシステムプロンプトとして設定されます。
+初期プロンプトを参考に、感情タグを指定することでキャラクターの表情やモーションを制御できます。例: [neutral]おはようございます！[happy]今日もお疲れ様です！`}
+          </div>
         </div>
         <div className="my-4 whitespace-pre-line">
-          {t('CharacterpresetInfo')}
+          {`プリセットを選択すると、キャラクタープロンプトが変更されます。
+Cmd + Shift + 1~5 (Mac) / Ctrl + Shift + 1~5 (Windows)でショートカットが可能です。`}
         </div>
         <div className="my-6 mb-2">
           <div className="flex flex-wrap gap-2 mb-4" role="tablist">
@@ -596,9 +624,7 @@ const Character = () => {
                     })
 
                     toastStore.getState().addToast({
-                      message: t('Toasts.PresetSwitching', {
-                        presetName: customName,
-                      }),
+                      message: `${customName}に切り替わりました。`,
                       type: 'info',
                       tag: `character-preset-switching`,
                     })
@@ -615,9 +641,7 @@ const Character = () => {
                       })
 
                       toastStore.getState().addToast({
-                        message: t('Toasts.PresetSwitching', {
-                          presetName: customName,
-                        }),
+                        message: `${customName}に切り替わりました。`,
                         type: 'info',
                         tag: `character-preset-switching`,
                       })
@@ -655,11 +679,9 @@ const Character = () => {
                         [customNameKey]: e.target.value,
                       })
                     }}
-                    aria-label={t('PresetNameLabel', {
-                      defaultValue: 'Preset Name',
-                    })}
+                    aria-label={`プリセット${index + 1}の名前`}
                     className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm w-full"
-                    placeholder={t(`Characterpreset${index + 1}`)}
+                    placeholder={`プリセット${index + 1}`}
                   />
                 </div>
                 <textarea
@@ -672,9 +694,7 @@ const Character = () => {
                       [key]: newValue,
                     })
                   }}
-                  aria-label={t('SystemPromptLabel', {
-                    defaultValue: 'System Prompt',
-                  })}
+                  aria-label={`プリセット${index + 1}のシステムプロンプト`}
                   className="px-3 py-2 bg-white border border-gray-300 rounded-md w-full h-64 text-sm"
                 />
               </div>

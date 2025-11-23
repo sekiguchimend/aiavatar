@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { IconButton } from './iconButton'
@@ -39,8 +37,6 @@ export const MessageInput = ({
   const realtimeAPIMode = settingsStore((s) => s.realtimeAPIMode)
   const showSilenceProgressBar = settingsStore((s) => s.showSilenceProgressBar)
   const speechRecognitionMode = settingsStore((s) => s.speechRecognitionMode)
-
-  const { t } = useTranslation()
 
   useEffect(() => {
     if (chatProcessing) {
@@ -105,15 +101,13 @@ export const MessageInput = ({
       {showPermissionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-2xl max-w-md">
-            <h3 className="text-xl font-bold mb-4">
-              {t('MicrophonePermission')}
-            </h3>
-            <p className="mb-4">{t('MicrophonePermissionMessage')}</p>
+            <h3 className="text-xl font-bold mb-4">マイクの使用許可</h3>
+            <p className="mb-4">マイクの使用を許可してください。</p>
             <button
               className="bg-secondary hover:bg-secondary-hover px-4 py-2 rounded-lg"
               onClick={() => setShowPermissionModal(false)}
             >
-              {t('Close')}
+              {'閉じる'}
             </button>
           </div>
         </div>
@@ -163,10 +157,10 @@ export const MessageInput = ({
               ref={textareaRef}
               placeholder={
                 chatProcessing
-                  ? `${t('AnswerGenerating')}${loadingDots}`
+                  ? `${'回答生成中'}${loadingDots}`
                   : continuousMicListeningMode && isMicRecording
-                    ? t('ListeningContinuously')
-                    : t('EnterYourQuestion')
+                    ? '音声入力を待機中...'
+                    : '聞きたいことをいれてね'
               }
               onChange={onChangeUserMessage}
               onKeyDown={handleKeyPress}

@@ -1,8 +1,6 @@
 import { useState, KeyboardEvent, useEffect } from 'react'
 import { IconButton } from '@/components/iconButton'
 import settingsStore from '@/features/stores/settings'
-import { useTranslation } from 'react-i18next'
-
 type SendType = 'direct_send' | 'ai_generate' | 'user_input'
 
 interface RequestBody {
@@ -31,7 +29,6 @@ const SendMessage = () => {
   const [useCurrentSystemPrompt, setUseCurrentSystemPrompt] = useState(false)
   const [baseUrl, setBaseUrl] = useState('')
   const [activeTab, setActiveTab] = useState<SendType>('direct_send')
-  const { t } = useTranslation()
 
   useEffect(() => {
     const storedClientId = settingsStore.getState().clientId
@@ -210,11 +207,17 @@ const SendMessage = () => {
   const getTabDescription = () => {
     switch (activeTab) {
       case 'direct_send':
-        return t('SendMessage.directSendDescription')
+        return `送信したメッセージをそのままAIキャラに発言させることができます。複数送信した場合は順番に処理されます。
+音声モデルはアバターデモの設定で選択したものが使用されます。`
       case 'ai_generate':
-        return t('SendMessage.aiGenerateDescription')
+        return `送信したメッセージからAIが回答を生成し、その回答をAIキャラに発言させます。複数送信した場合は順番に処理されます。
+AIモデルおよび音声モデルはアバターデモの設定で選択したものが使用されます。
+システムプロンプトはアバターデモのシステムプロンプトを使用するか、カスタムのシステムプロンプトを使用するかを選択できます。
+過去の会話履歴を読み込ませる場合は、システムプロンプト または ユーザーメッセージの任意の位置に [conversation_history] という文字列を含めてください。`
       case 'user_input':
-        return t('SendMessage.userInputDescription')
+        return `送信したメッセージはアバターデモの入力フォームから入力された場合と同じ処理がされます。複数送信した場合は順番に処理されます。
+AIモデルおよび音声モデルはアバターデモの設定で選択したものが使用されます。
+システムプロンプトや会話履歴はアバターデモの値が使用されます。`
       default:
         return ''
     }
@@ -224,11 +227,11 @@ const SendMessage = () => {
   const getTabTitle = () => {
     switch (activeTab) {
       case 'direct_send':
-        return t('SendMessage.directSendTitle')
+        return 'AIキャラにそのまま発言させる'
       case 'ai_generate':
-        return t('SendMessage.aiGenerateTitle')
+        return 'AIで回答を生成してから発言させる'
       case 'user_input':
-        return t('SendMessage.userInputTitle')
+        return 'ユーザー入力を送信する'
       default:
         return ''
     }
@@ -320,7 +323,7 @@ const SendMessage = () => {
     <div className="flex flex-col items-center text-black min-h-screen bg-blue-50 py-8">
       <div className="w-full max-w-4xl px-4 md:px-8">
         <h1 className="text-text-primary text-3xl font-bold mb-8 text-center">
-          {t('SendMessage.title')}
+          {'アバターデモ 外部アダプター'}
         </h1>
 
         {/* Client ID セクション */}
@@ -369,7 +372,7 @@ const SendMessage = () => {
                   d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                 />
               </svg>
-              {t('SendMessage.directSendTitle')}
+              {'AIキャラにそのまま発言させる'}
             </button>
             <button
               className={`flex items-center mb-2 md:mb-0 px-4 py-2 font-medium text-sm rounded-t-lg transition-colors duration-200 ${
@@ -393,7 +396,7 @@ const SendMessage = () => {
                   d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              {t('SendMessage.aiGenerateTitle')}
+              {'AIで回答を生成してから発言させる'}
             </button>
             <button
               className={`flex items-center px-4 py-2 font-medium text-sm rounded-t-lg transition-colors duration-200 ${
@@ -417,7 +420,7 @@ const SendMessage = () => {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              {t('SendMessage.userInputTitle')}
+              {'ユーザー入力を送信する'}
             </button>
           </div>
 
@@ -480,7 +483,7 @@ const SendMessage = () => {
                   />
                   <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                   <span className="ms-3 text-sm font-medium text-gray-700">
-                    {t('SendMessage.useCurrentSystemPrompt')}
+                    {'アバターデモのシステムプロンプトを利用する'}
                   </span>
                 </label>
               </div>

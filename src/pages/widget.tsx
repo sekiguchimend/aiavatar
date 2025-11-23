@@ -12,12 +12,15 @@ import CharacterPresetMenu from '@/components/characterPresetMenu'
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { handleSendChatFn } from '@/features/chat/handlers'
-import '@/lib/i18n'
 import { buildUrl } from '@/utils/buildUrl'
 
 const Widget = () => {
   const router = useRouter()
-  const { 'api-key': apiKey, 'model-type': modelType, 'character-name': characterName } = router.query
+  const {
+    'api-key': apiKey,
+    'model-type': modelType,
+    'character-name': characterName,
+  } = router.query
 
   const webcamStatus = homeStore((s) => s.webcamStatus)
   const captureStatus = homeStore((s) => s.captureStatus)
@@ -54,10 +57,13 @@ const Widget = () => {
 
       // Notify parent that widget is ready
       if (typeof window !== 'undefined' && window.parent !== window) {
-        window.parent.postMessage({
-          type: 'widget-ready',
-          data: { status: 'ready' }
-        }, '*')
+        window.parent.postMessage(
+          {
+            type: 'widget-ready',
+            data: { status: 'ready' },
+          },
+          '*'
+        )
       }
     }
   }, [router.query, apiKey, modelType, characterName])
@@ -72,13 +78,16 @@ const Widget = () => {
         if (message && typeof message === 'string') {
           // Send message directly
           handleSendChat(message)
-          
+
           // Notify parent
           if (typeof window !== 'undefined' && window.parent !== window) {
-            window.parent.postMessage({
-              type: 'message-sent',
-              data: { message }
-            }, '*')
+            window.parent.postMessage(
+              {
+                type: 'message-sent',
+                data: { message },
+              },
+              '*'
+            )
           }
         }
       }
@@ -92,15 +101,24 @@ const Widget = () => {
 
   // Listen for assistant messages to notify parent
   useEffect(() => {
-    if (assistantMessage && typeof window !== 'undefined' && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'message-received',
-        data: { message: assistantMessage }
-      }, '*')
+    if (
+      assistantMessage &&
+      typeof window !== 'undefined' &&
+      window.parent !== window
+    ) {
+      window.parent.postMessage(
+        {
+          type: 'message-received',
+          data: { message: assistantMessage },
+        },
+        '*'
+      )
     }
   }, [assistantMessage])
 
-  const displayModelType = (modelType && typeof modelType === 'string' ? modelType : currentModelType) as 'vrm' | 'live2d'
+  const displayModelType = (
+    modelType && typeof modelType === 'string' ? modelType : currentModelType
+  ) as 'vrm' | 'live2d'
 
   return (
     <div className="h-[100svh] bg-cover" style={{ backgroundImage: bgUrl }}>
@@ -117,4 +135,3 @@ const Widget = () => {
 }
 
 export default Widget
-

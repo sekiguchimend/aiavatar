@@ -1,9 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 
 const Description = () => {
-  const { t } = useTranslation()
-
   return (
     <>
       <div className="mb-6">
@@ -15,7 +12,9 @@ const Description = () => {
             height={24}
             className="mr-2"
           />
-          <h2 className="text-2xl font-bold">{t('AboutThisApplication')}</h2>
+          <h2 className="text-2xl font-bold">
+            {'このアプリケーションについて'}
+          </h2>
         </div>
         <div className="mb-6">
           <div className="my-2 whitespace-pre-line">
@@ -24,7 +23,7 @@ const Description = () => {
           </div>
         </div>
         <div className="my-10">
-          <div className="mb-4 text-xl font-bold">{t('Contact')}</div>
+          <div className="mb-4 text-xl font-bold">{'お問い合わせ'}</div>
           <div className="my-2 whitespace-pre-line">
             <a
               href="mailto:taichi.taniguchi@queue-tech.jp"
@@ -35,7 +34,7 @@ const Description = () => {
           </div>
         </div>
         <div className="mt-10">
-          <div className="mb-4 text-xl font-bold">{t('Creator')}</div>
+          <div className="mb-4 text-xl font-bold">{'作成者情報'}</div>
           <div className="my-2 whitespace-pre-line">作成者: ジョン</div>
         </div>
       </div>

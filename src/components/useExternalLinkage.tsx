@@ -1,6 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
-
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import webSocketStore from '@/features/stores/websocketStore'
@@ -24,7 +22,6 @@ interface Params {
 }
 
 const useExternalLinkage = ({ handleReceiveTextFromWs }: Params) => {
-  const { t } = useTranslation()
   const externalLinkageMode = settingsStore((s) => s.externalLinkageMode)
   const [receivedMessages, setTmpMessages] = useState<TmpMessage[]>([])
 
@@ -81,7 +78,7 @@ const useExternalLinkage = ({ handleReceiveTextFromWs }: Params) => {
       return new WebSocket('ws://localhost:8000/ws')
     }
 
-    webSocketStore.getState().initializeWebSocket(t, handlers, connectWebsocket)
+    webSocketStore.getState().initializeWebSocket(handlers, connectWebsocket)
 
     const reconnectInterval = setInterval(() => {
       const ss = settingsStore.getState()
@@ -96,7 +93,7 @@ const useExternalLinkage = ({ handleReceiveTextFromWs }: Params) => {
         wsManager.disconnect()
         webSocketStore
           .getState()
-          .initializeWebSocket(t, handlers, connectWebsocket)
+          .initializeWebSocket(handlers, connectWebsocket)
       }
     }, 2000)
 
@@ -104,7 +101,7 @@ const useExternalLinkage = ({ handleReceiveTextFromWs }: Params) => {
       clearInterval(reconnectInterval)
       webSocketStore.getState().disconnect()
     }
-  }, [externalLinkageMode, t])
+  }, [externalLinkageMode])
 
   return null
 }

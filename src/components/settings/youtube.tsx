@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 
 import homeStore from '@/features/stores/home'
@@ -12,13 +11,10 @@ const YouTube = () => {
   const youtubeMode = settingsStore((s) => s.youtubeMode)
   const youtubeLiveId = settingsStore((s) => s.youtubeLiveId)
   const externalLinkageMode = settingsStore((s) => s.externalLinkageMode)
-  const selectAIService = settingsStore((s) => s.selectAIService)
 
   const conversationContinuityMode = settingsStore(
     (s) => s.conversationContinuityMode
   )
-
-  const { t } = useTranslation()
 
   const handleChangeYoutubeMode = (youtubeMode: boolean) => {
     settingsStore.setState({ youtubeMode })
@@ -41,17 +37,17 @@ const YouTube = () => {
           height={24}
           className="mr-2"
         />
-        <h2 className="text-2xl font-bold">{t('YoutubeSettings')}</h2>
+        <h2 className="text-2xl font-bold">{'YouTube設定'}</h2>
       </div>
-      <div className="mb-4 text-xl font-bold">{t('YoutubeMode')}</div>
+      <div className="mb-4 text-xl font-bold">{'YouTubeモード'}</div>
       <div className="my-2">
         {youtubeMode ? (
           <TextButton onClick={() => handleChangeYoutubeMode(false)}>
-            {t('StatusOn')}
+            {'状態:ON'}
           </TextButton>
         ) : (
           <TextButton onClick={() => handleChangeYoutubeMode(true)}>
-            {t('StatusOff')}
+            {'状態:OFF'}
           </TextButton>
         )}
       </div>
@@ -60,9 +56,11 @@ const YouTube = () => {
           if (youtubeMode) {
             return (
               <>
-                <div className="">{t('YoutubeInfo')}</div>
+                <div className="">
+                  {'先頭が「#」のコメントは無視されます。'}
+                </div>
                 <div className="my-4 text-xl font-bold">
-                  {t('YoutubeAPIKey')}
+                  {'YouTube API キー'}
                 </div>
                 <input
                   className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg"
@@ -76,7 +74,7 @@ const YouTube = () => {
                   }
                 />
                 <div className="my-4 text-xl font-bold">
-                  {t('YoutubeLiveID')}
+                  {'YouTube Live ID'}
                 </div>
                 <input
                   className="text-ellipsis px-4 py-2 w-col-span-2 bg-white hover:bg-white-hover rounded-lg"
@@ -91,16 +89,22 @@ const YouTube = () => {
                 />
                 <div className="mt-6">
                   <div className="my-4 text-xl font-bold">
-                    {t('ConversationContinuityMode')}
+                    {'会話継続モード(ベータ版)'}
                   </div>
                   <div className="my-2">
-                    {t('ConversationContinuityModeInfo')}
+                    {
+                      'コメントが無いときにAIが自ら会話を継続しようとするモードです。現在OpenAI, Anthropic Claude, Google Geminiのみ対応しています。'
+                    }
                   </div>
                   <div className="my-2">
-                    {t('ConversationContinuityModeInfo2')}
+                    {
+                      '一度の回答で複数回LLMを呼び出すため、API利用料が増える可能性があります。ご注意ください。'
+                    }
                   </div>
                   <div className="mb-4">
-                    {t('ConversationContinuityModeInfo3')}
+                    {
+                      'gpt-4o, gpt-4-turbo, claude-3-opus, claude-3.5-sonnetで比較的安定動作します。'
+                    }
                   </div>
                   <TextButton
                     onClick={() =>
@@ -108,12 +112,9 @@ const YouTube = () => {
                         conversationContinuityMode: !conversationContinuityMode,
                       })
                     }
-                    disabled={
-                      !multiModalAIServices.includes(selectAIService as any) ||
-                      externalLinkageMode
-                    }
+                    disabled={externalLinkageMode}
                   >
-                    {t(conversationContinuityMode ? 'StatusOn' : 'StatusOff')}
+                    {conversationContinuityMode ? '状態：ON' : '状態：OFF'}
                   </TextButton>
                 </div>
               </>

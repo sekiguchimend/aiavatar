@@ -1,11 +1,10 @@
 import { Talk } from './messages'
-import { Language } from '@/features/constants/settings'
 
 export async function synthesizeVoiceElevenlabsApi(
   talk: Talk,
   apiKey: string,
   voiceId: string,
-  language: Language
+  language: string
 ) {
   try {
     const body = {

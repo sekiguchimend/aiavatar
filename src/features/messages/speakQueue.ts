@@ -12,7 +12,7 @@ type SpeakTask = {
 }
 
 export class SpeakQueue {
-  private static readonly QUEUE_CHECK_DELAY = 1500
+  private static readonly QUEUE_CHECK_DELAY = 500
   private queue: SpeakTask[] = []
   private isProcessing = false
   private currentSessionId: string | null = null

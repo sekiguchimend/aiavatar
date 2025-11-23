@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { useTranslation } from 'react-i18next'
 import { Form } from '@/components/form'
 import MessageReceiver from '@/components/messageReceiver'
 import { Introduction } from '@/components/introduction'
@@ -16,13 +15,20 @@ import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { handleSendChatFn } from '@/features/chat/handlers'
 import { AIService } from '@/features/constants/settings'
-import '@/lib/i18n'
 import { buildUrl } from '@/utils/buildUrl'
 import toastStore from '@/features/stores/toast'
 
 const Home = () => {
   const router = useRouter()
-  const { widget, 'api-key': apiKey, 'google-key': googleKey, 'ai-service': aiService, 'ai-model': aiModel, 'model-type': modelType, 'character-name': characterName } = router.query
+  const {
+    widget,
+    'api-key': apiKey,
+    'google-key': googleKey,
+    'ai-service': aiService,
+    'ai-model': aiModel,
+    'model-type': modelType,
+    'character-name': characterName,
+  } = router.query
   const webcamStatus = homeStore((s) => s.webcamStatus)
   const captureStatus = homeStore((s) => s.captureStatus)
   const backgroundImageUrl = homeStore((s) => s.backgroundImageUrl)
@@ -33,7 +39,6 @@ const Home = () => {
       : `url(${buildUrl(backgroundImageUrl)})`
   const messageReceiverEnabled = settingsStore((s) => s.messageReceiverEnabled)
   const currentModelType = settingsStore((s) => s.modelType)
-  const { t } = useTranslation()
   const handleSendChat = handleSendChatFn()
 
   // Widget mode configuration
@@ -64,14 +69,8 @@ const Home = () => {
       if (modelType && typeof modelType === 'string') {
         settingsStore.setState({ modelType: modelType as 'vrm' | 'live2d' })
       } else {
-        // デフォルトをLive2Dに設定
-        settingsStore.setState({ modelType: 'live2d' })
-      }
-
-      // デフォルトのLive2Dパスを設定（設定されていない場合）
-      const currentLive2DPath = settingsStore.getState().selectedLive2DPath
-      if (!currentLive2DPath || currentLive2DPath === '') {
-        settingsStore.setState({ selectedLive2DPath: '/live2d/queue/queue.model3.json' })
+        // デフォルトをVRMに設定
+        settingsStore.setState({ modelType: 'vrm' })
       }
 
       if (characterName && typeof characterName === 'string') {
@@ -79,10 +78,13 @@ const Home = () => {
       }
 
       if (typeof window !== 'undefined' && window.parent !== window) {
-        window.parent.postMessage({
-          type: 'widget-ready',
-          data: { status: 'ready' }
-        }, '*')
+        window.parent.postMessage(
+          {
+            type: 'widget-ready',
+            data: { status: 'ready' },
+          },
+          '*'
+        )
       }
     }
   }, [widget, apiKey, googleKey, aiService, aiModel, modelType, characterName])
@@ -97,10 +99,13 @@ const Home = () => {
         if (message && typeof message === 'string') {
           handleSendChat(message)
           if (typeof window !== 'undefined' && window.parent !== window) {
-            window.parent.postMessage({
-              type: 'message-sent',
-              data: { message }
-            }, '*')
+            window.parent.postMessage(
+              {
+                type: 'message-sent',
+                data: { message },
+              },
+              '*'
+            )
           }
         }
       }
@@ -114,11 +119,19 @@ const Home = () => {
 
   // Notify parent of assistant messages (widget mode)
   useEffect(() => {
-    if (widget === 'true' && assistantMessage && typeof window !== 'undefined' && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'message-received',
-        data: { message: assistantMessage }
-      }, '*')
+    if (
+      widget === 'true' &&
+      assistantMessage &&
+      typeof window !== 'undefined' &&
+      window.parent !== window
+    ) {
+      window.parent.postMessage(
+        {
+          type: 'message-received',
+          data: { message: assistantMessage },
+        },
+        '*'
+      )
     }
   }, [widget, assistantMessage])
   const characterPresets = [
@@ -162,10 +175,15 @@ const Home = () => {
           settingsStore.setState({
             systemPrompt: characterPresets[keyNumber - 1].value,
           })
+          const presetNames = [
+            'プリセット1',
+            'プリセット2',
+            'プリセット3',
+            'プリセット4',
+            'プリセット5',
+          ]
           toastStore.getState().addToast({
-            message: t('Toasts.PresetSwitching', {
-              presetName: t(`Characterpreset${keyNumber}`),
-            }),
+            message: `${presetNames[keyNumber - 1]}に切り替わりました。`,
             type: 'info',
             tag: `character-preset-switching`,
           })
@@ -183,7 +201,13 @@ const Home = () => {
     <div className="h-[100svh] bg-cover" style={{ backgroundImage: bgUrl }}>
       <Meta />
       <Introduction />
-      {(modelType && typeof modelType === 'string' ? modelType : currentModelType) === 'vrm' ? <VrmViewer /> : <Live2DViewer />}
+      {(modelType && typeof modelType === 'string'
+        ? modelType
+        : currentModelType) === 'vrm' ? (
+        <VrmViewer />
+      ) : (
+        <Live2DViewer />
+      )}
       <Form />
       <Menu />
       <ModalImage />

@@ -5,7 +5,6 @@ import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { messageSelectors } from '../messages/messageSelectors'
 import webSocketStore from '@/features/stores/websocketStore'
-import i18next from 'i18next'
 import toastStore from '@/features/stores/toast'
 import { generateMessageId } from '@/utils/messageUtils'
 
@@ -598,7 +597,7 @@ export const handleSendChatFn = () => async (text: string) => {
       )
     } else {
       toastStore.getState().addToast({
-        message: i18next.t('NotConnectedToExternalAssistant'),
+        message: '外部アシスタントと接続されていません。',
         type: 'error',
         tag: 'not-connected-to-external-assistant',
       })

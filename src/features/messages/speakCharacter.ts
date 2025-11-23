@@ -14,7 +14,6 @@ import { synthesizeVoiceGSVIApi } from './synthesizeVoiceGSVI'
 import { synthesizeVoiceOpenAIApi } from './synthesizeVoiceOpenAI'
 import { synthesizeVoiceAzureOpenAIApi } from './synthesizeVoiceAzureOpenAI'
 import toastStore from '@/features/stores/toast'
-import i18next from 'i18next'
 import { SpeakQueue } from './speakQueue'
 import { synthesizeVoiceNijivoiceApi } from './synthesizeVoiceNijivoice'
 import { Live2DHandler } from './live2dHandler'
@@ -53,11 +52,7 @@ export function preprocessMessage(
   // 1. 設定でオンになっている
   // 2. 言語が日本語
   // 3. テキストに英語のような文字が含まれている場合のみ
-  if (
-    settings.changeEnglishToJapanese &&
-    settings.selectLanguage === 'ja' &&
-    containsEnglish(processed)
-  ) {
+  if (settings.changeEnglishToJapanese && containsEnglish(processed)) {
     // この時点で処理済みのテキストを返す（後で非同期で変換処理を完了する）
     return processed
   }
@@ -94,11 +89,7 @@ async function synthesizeVoice(
           ss.voicevoxServerUrl
         )
       case 'google':
-        return await synthesizeVoiceGoogleApi(
-          talk,
-          ss.googleTtsType,
-          ss.selectLanguage
-        )
+        return await synthesizeVoiceGoogleApi(talk, ss.googleTtsType, 'ja')
       case 'stylebertvits2':
         return await synthesizeStyleBertVITS2Api(
           talk,
@@ -108,7 +99,7 @@ async function synthesizeVoice(
           ss.stylebertvits2Style,
           ss.stylebertvits2SdpRatio,
           ss.stylebertvits2Length,
-          ss.selectLanguage
+          'ja'
         )
       case 'aivis_speech':
         return await synthesizeVoiceAivisSpeechApi(
@@ -147,7 +138,7 @@ async function synthesizeVoice(
           talk,
           ss.elevenlabsApiKey,
           ss.elevenlabsVoiceId,
-          ss.selectLanguage
+          'ja'
         )
       case 'openai':
         return await synthesizeVoiceOpenAIApi(
@@ -160,8 +151,8 @@ async function synthesizeVoice(
       case 'azure':
         return await synthesizeVoiceAzureOpenAIApi(
           talk,
-          ss.azureTTSKey || ss.azureKey,
-          ss.azureTTSEndpoint || ss.azureEndpoint,
+          ss.azureTTSKey,
+          ss.azureTTSEndpoint,
           ss.openaiTTSVoice,
           ss.openaiTTSSpeed
         )
@@ -229,8 +220,9 @@ const createSpeakCharacter = () => {
 
     const processAndSynthesizePromise = prevFetchPromise.then(async () => {
       const now = Date.now()
-      if (now - lastTime < 1000) {
-        await wait(1000 - (now - lastTime))
+      // 待機時間を100msに短縮（連続リクエストの制限を緩和）
+      if (now - lastTime < 100) {
+        await wait(100 - (now - lastTime))
       }
 
       // ボタン停止でキャンセルされた場合はここで終了
@@ -241,7 +233,6 @@ const createSpeakCharacter = () => {
       if (
         processedMessage &&
         ss.changeEnglishToJapanese &&
-        ss.selectLanguage === 'ja' &&
         containsEnglish(processedMessage)
       ) {
         try {
@@ -334,12 +325,9 @@ export function handleTTSError(error: unknown, serviceName: string): void {
   } else if (typeof error === 'string') {
     message = error
   } else {
-    message = i18next.t('Errors.UnexpectedError')
+    message = '不明なエラーが発生しました'
   }
-  const errorMessage = i18next.t('Errors.TTSServiceError', {
-    serviceName,
-    message,
-  })
+  const errorMessage = `${serviceName} TTSサービスでエラーが発生しました: ${message}`
 
   toastStore.getState().addToast({
     message: errorMessage,

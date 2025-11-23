@@ -1,10 +1,10 @@
 import { Talk } from './messages'
-import { Language, VoiceLanguage } from '@/features/constants/settings'
+import { VoiceLanguage } from '@/features/constants/settings'
 
 export async function synthesizeVoiceGoogleApi(
   talk: Talk,
   googleTtsType: string,
-  selectLanguage: Language
+  selectLanguage: string
 ) {
   try {
     const googleTtsTypeByLang = getGoogleTtsType(googleTtsType, selectLanguage)
@@ -54,7 +54,7 @@ export async function synthesizeVoiceGoogleApi(
 
 function getGoogleTtsType(
   googleTtsType: string,
-  selectLanguage: Language
+  selectLanguage: string
 ): string {
   if (googleTtsType && googleTtsType.trim()) return googleTtsType
 
@@ -94,7 +94,7 @@ function getGoogleTtsType(
   }
 }
 
-function getVoiceLanguageCode(selectLanguage: Language): VoiceLanguage {
+function getVoiceLanguageCode(selectLanguage: string): VoiceLanguage {
   switch (selectLanguage) {
     case 'ja':
       return 'ja-JP'

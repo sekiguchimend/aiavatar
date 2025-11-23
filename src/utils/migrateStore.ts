@@ -1,4 +1,3 @@
-import { isLanguageSupported } from '@/features/constants/settings'
 import homeStore, { PersistedState } from '@/features/stores/home'
 import settingsStore, { SettingsState } from '@/features/stores/settings'
 
@@ -23,11 +22,6 @@ const migrateStore = () => {
       ;(hs as any)[k] = v
     }
   })
-
-  // selectLanguage migration: follow ISO 639-1 and lowercased, e.g. JP → ja
-  let lang = ss.selectLanguage.toLowerCase()
-  lang = lang === 'jp' ? 'ja' : lang
-  ss.selectLanguage = isLanguageSupported(lang) ? lang : 'ja'
 
   settingsStore.setState(ss)
   homeStore.setState(hs)

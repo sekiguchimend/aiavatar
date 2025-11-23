@@ -26,7 +26,7 @@ export default async function handler(
     }
     const files = await fs.promises.readdir(vrmDir)
     const vrmFiles = files.filter((file) => file.endsWith('.vrm'))
-    
+
     // キャッシュを更新
     cachedVrmFiles = vrmFiles
     cacheTimestamp = now

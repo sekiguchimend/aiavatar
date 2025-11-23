@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { SessionConfig, TmpMessage } from './realtimeAPIUtils'
@@ -22,7 +21,6 @@ interface Params {
 }
 
 const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
-  const { t } = useTranslation()
   const realtimeAPIMode = settingsStore((s) => s.realtimeAPIMode)
   const accumulatedAudioDataRef = useRef(
     new AudioBufferManager(async (buffer) => {
@@ -91,7 +89,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
           if (functionDef) {
             console.log(`Executing function ${funcName}`)
             toastId = toastStore.getState().addToast({
-              message: t('Toasts.FunctionExecuting', { funcName }),
+              message: `${funcName}を実行しています`,
               type: 'info',
               duration: 120000,
               tag: `run-${funcName}`,
@@ -114,7 +112,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
             toastStore.getState().removeToast(toastId)
           }
           toastId = toastStore.getState().addToast({
-            message: t('Toasts.FunctionExecutionFailed', { funcName }),
+            message: `${funcName}の実行に失敗しました`,
             type: 'error',
             duration: 3000,
             tag: `run-${funcName}`,
@@ -122,7 +120,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
         }
       }
     },
-    [t, sendFunctionCallOutput]
+    [sendFunctionCallOutput]
   )
 
   const handleMessageType = useCallback(
@@ -236,33 +234,13 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
     const wsManager = webSocketStore.getState().wsManager
     if (wsManager?.isConnected()) return wsManager.websocket
 
-    const ss = settingsStore.getState()
-    if (!ss.selectAIService) return null
-
-    let ws: WebSocket | null = null
-    if (ss.selectAIService === 'openai') {
-      const model: RealtimeAPIModeModel =
-        (ss.selectAIModel as RealtimeAPIModeModel) ||
-        defaultModels.openaiRealtime
-      const url = `wss://api.openai.com/v1/realtime?model=${model}`
-      ws = new WebSocket(url, [
-        'realtime',
-        `openai-insecure-api-key.${ss.openaiKey}`,
-        'openai-beta.realtime-v1',
-      ])
-    } else if (ss.selectAIService === 'azure') {
-      const url = `${ss.azureEndpoint}&api-key=${ss.azureKey}`
-      ws = new WebSocket(url, [])
-    } else {
-      return null
-    }
-
-    return ws
+    // Gemini does not support RealtimeAPI
+    return null
   }
 
   useEffect(() => {
     const ss = settingsStore.getState()
-    if (!ss.realtimeAPIMode || !ss.selectAIService) return
+    if (!ss.realtimeAPIMode) return
 
     const handlers = {
       onOpen: onOpen,
@@ -271,7 +249,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
       onClose: onClose,
     }
 
-    webSocketStore.getState().initializeWebSocket(t, handlers, connectWebsocket)
+    webSocketStore.getState().initializeWebSocket(handlers, connectWebsocket)
 
     const wsManager = webSocketStore.getState().wsManager
 
@@ -288,7 +266,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
         wsManager.disconnect()
         webSocketStore
           .getState()
-          .initializeWebSocket(t, handlers, connectWebsocket)
+          .initializeWebSocket(handlers, connectWebsocket)
       }
     }, 2000)
 
@@ -296,7 +274,7 @@ const useRealtimeAPI = ({ handleReceiveTextFromRt }: Params) => {
       clearInterval(reconnectInterval)
       webSocketStore.getState().disconnect()
     }
-  }, [realtimeAPIMode, processMessage, t, onOpen, onMessage, onError, onClose])
+  }, [realtimeAPIMode, processMessage, onOpen, onMessage, onError, onClose])
 
   return null
 }

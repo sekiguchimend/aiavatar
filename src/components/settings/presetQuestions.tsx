@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
@@ -10,10 +9,7 @@ import { IconButton } from '../iconButton'
 const PresetQuestions = () => {
   const presetQuestions = settingsStore((s) => s.presetQuestions)
   const showPresetQuestions = settingsStore((s) => s.showPresetQuestions)
-  const [newQuestion, setNewQuestion] = useState('')
-  const { t } = useTranslation()
-
-  // Sort questions by order
+  const [newQuestion, setNewQuestion] = useState('') // Sort questions by order
   const sortedQuestions = [...presetQuestions].sort((a, b) => a.order - b.order)
 
   const handleAddQuestion = () => {
@@ -84,12 +80,16 @@ const PresetQuestions = () => {
   return (
     <div className="mb-10">
       <div className="mb-6">
-        <div className="mb-4 text-xl font-bold">{t('PresetQuestions')}</div>
-        <div className="my-4 text-base">{t('PresetQuestionsInfo')}</div>
+        <div className="mb-4 text-xl font-bold">{'質問の事前設定'}</div>
+        <div className="my-4 text-base">
+          {
+            '複数の質問パターンを事前に作成・登録できます。登録された質問はユーザーUI上にボタン形式で表示され、クリックするとチャット入力欄にセットされます。'
+          }
+        </div>
 
         <div className="my-4">
           <TextButton onClick={handleToggleShowPresetQuestions}>
-            {t(showPresetQuestions ? 'StatusOn' : 'StatusOff')}
+            {showPresetQuestions ? '状態：ON' : '状態：OFF'}
           </TextButton>
         </div>
       </div>
@@ -101,7 +101,7 @@ const PresetQuestions = () => {
             type="text"
             value={newQuestion}
             onChange={(e) => setNewQuestion(e.target.value)}
-            placeholder={t('EnterPresetQuestion')}
+            placeholder={'質問を入力してください'}
           />
           <IconButton
             iconName="24/Add"
@@ -138,7 +138,7 @@ const PresetQuestions = () => {
                             <div
                               {...provided.dragHandleProps}
                               className="cursor-move px-2 py-3 text-gray-500 flex items-center justify-center"
-                              title={t('DragToReorder')}
+                              title={'ドラッグして順番を変更'}
                             >
                               ⋮⋮
                             </div>

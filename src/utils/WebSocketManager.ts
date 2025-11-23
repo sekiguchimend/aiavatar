@@ -1,11 +1,8 @@
 import toastStore from '@/features/stores/toast'
 import settingsStore from '@/features/stores/settings'
 
-type TranslationFunction = (key: string, options?: any) => string
-
 export class WebSocketManager {
   private ws: WebSocket | null = null
-  private t: TranslationFunction
   private isTextBlockStarted: boolean = false
   private handlers: {
     onOpen: (event: Event) => void
@@ -16,7 +13,6 @@ export class WebSocketManager {
   private connectWebsocket: () => WebSocket | null
 
   constructor(
-    t: TranslationFunction,
     handlers: {
       onOpen: (event: Event) => void
       onMessage: (event: MessageEvent) => Promise<void>
@@ -25,7 +21,6 @@ export class WebSocketManager {
     },
     connectWebsocket: () => WebSocket | null
   ) {
-    this.t = t
     this.handlers = handlers
     this.connectWebsocket = connectWebsocket
   }
@@ -34,7 +29,7 @@ export class WebSocketManager {
     console.log('WebSocket connection opened:', event)
     this.removeToast()
     toastStore.getState().addToast({
-      message: this.t('Toasts.WebSocketConnectionSuccess'),
+      message: 'WebSocket接続に成功しました',
       type: 'success',
       duration: 3000,
       tag: 'websocket-connection-success',
@@ -51,7 +46,7 @@ export class WebSocketManager {
     console.error('WebSocket error:', event)
     this.removeToast()
     toastStore.getState().addToast({
-      message: this.t('Toasts.WebSocketConnectionError'),
+      message: 'WebSocket接続にエラーが発生しました',
       type: 'error',
       duration: 5000,
       tag: 'websocket-connection-error',
@@ -63,7 +58,7 @@ export class WebSocketManager {
     console.log('WebSocket connection closed:', event)
     this.removeToast()
     toastStore.getState().addToast({
-      message: this.t('Toasts.WebSocketConnectionClosed'),
+      message: 'WebSocket接続が閉じられました',
       type: 'error',
       duration: 3000,
       tag: 'websocket-connection-close',
@@ -74,7 +69,7 @@ export class WebSocketManager {
   public connect() {
     this.removeToast()
     toastStore.getState().addToast({
-      message: this.t('Toasts.WebSocketConnectionAttempt'),
+      message: 'WebSocket接続を試みています...',
       type: 'info',
       duration: 10000,
       tag: 'websocket-connection-info',

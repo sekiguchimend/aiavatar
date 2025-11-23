@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 
 import AdvancedSettings from './advancedSettings'
@@ -7,8 +6,6 @@ import PresetQuestions from './presetQuestions'
 import TestAnswerUpload from './testAnswerUpload'
 
 const Other = () => {
-  const { t } = useTranslation()
-
   return (
     <>
       <div className="flex items-center mb-6">
@@ -19,7 +16,7 @@ const Other = () => {
           height={24}
           className="mr-2"
         />
-        <h2 className="text-2xl font-bold">{t('OtherSettings')}</h2>
+        <h2 className="text-2xl font-bold">{'その他'}</h2>
       </div>
 
       <AdvancedSettings />

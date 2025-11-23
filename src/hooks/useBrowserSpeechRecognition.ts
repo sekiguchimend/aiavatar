@@ -3,7 +3,6 @@ import { getVoiceLanguageCode } from '@/utils/voiceLanguage'
 import settingsStore from '@/features/stores/settings'
 import toastStore from '@/features/stores/toast'
 import homeStore from '@/features/stores/home'
-import { useTranslation } from 'react-i18next'
 import { useSilenceDetection } from './useSilenceDetection'
 import { SpeakQueue } from '@/features/messages/speakQueue'
 
@@ -13,8 +12,6 @@ import { SpeakQueue } from '@/features/messages/speakQueue'
 export const useBrowserSpeechRecognition = (
   onChatProcessStart: (text: string) => void
 ) => {
-  const { t } = useTranslation()
-  const selectLanguage = settingsStore((s) => s.selectLanguage)
   const initialSpeechTimeout = settingsStore((s) => s.initialSpeechTimeout)
 
   // ----- 状態管理 -----
@@ -99,7 +96,7 @@ export const useBrowserSpeechRecognition = (
     // Firefoxの場合はエラーメッセージを表示して終了
     if (navigator.userAgent.toLowerCase().includes('firefox')) {
       toastStore.getState().addToast({
-        message: t('Toasts.FirefoxNotSupported'),
+        message: 'Firefoxではこの機能はサポートされていません',
         type: 'error',
         tag: 'microphone-permission-error-firefox',
       })
@@ -115,13 +112,13 @@ export const useBrowserSpeechRecognition = (
       // ユーザーが明示的に拒否した場合や、その他のエラーの場合
       console.error('Microphone permission error:', error)
       toastStore.getState().addToast({
-        message: t('Toasts.MicrophonePermissionDenied'),
+        message: 'マイクの使用が拒否されました',
         type: 'error',
         tag: 'microphone-permission-error',
       })
       return false
     }
-  }, [t])
+  }, [])
 
   // ----- 音声認識開始処理 -----
   const startListening = useCallback(async () => {
@@ -184,7 +181,7 @@ export const useBrowserSpeechRecognition = (
               }
 
               toastStore.getState().addToast({
-                message: t('Toasts.NoSpeechDetected'),
+                message: '音声が検出されませんでした。',
                 type: 'info',
                 tag: 'no-speech-detected',
               })
@@ -277,7 +274,7 @@ export const useBrowserSpeechRecognition = (
     if (!SpeechRecognition) {
       console.error('Speech Recognition API is not supported in this browser')
       toastStore.getState().addToast({
-        message: t('Toasts.SpeechRecognitionNotSupported'),
+        message: '音声認識がサポートされていません',
         type: 'error',
         tag: 'speech-recognition-not-supported',
       })
@@ -285,7 +282,7 @@ export const useBrowserSpeechRecognition = (
     }
 
     const newRecognition = new SpeechRecognition()
-    newRecognition.lang = getVoiceLanguageCode(selectLanguage)
+    newRecognition.lang = getVoiceLanguageCode('ja')
     newRecognition.continuous = true
     newRecognition.interimResults = true
 
@@ -315,7 +312,7 @@ export const useBrowserSpeechRecognition = (
             }
 
             toastStore.getState().addToast({
-              message: t('Toasts.NoSpeechDetected'),
+              message: '音声が検出されませんでした。',
               type: 'info',
               tag: 'no-speech-detected',
             })
@@ -419,7 +416,7 @@ export const useBrowserSpeechRecognition = (
             }
 
             toastStore.getState().addToast({
-              message: t('Toasts.NoSpeechDetected'),
+              message: '音声が検出されませんでした。',
               type: 'info',
               tag: 'no-speech-detected',
             })
@@ -511,9 +508,7 @@ export const useBrowserSpeechRecognition = (
       clearInitialSpeechCheckTimer()
     }
   }, [
-    selectLanguage,
     initialSpeechTimeout,
-    t,
     // stopListening,
     clearSilenceDetection,
     clearInitialSpeechCheckTimer,

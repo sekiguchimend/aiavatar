@@ -6,7 +6,6 @@ import { SYSTEM_PROMPT } from '@/features/constants/systemPromptConstants'
 import {
   AIService,
   AIVoice,
-  Language,
   OpenAITTSVoice,
   OpenAITTSModel,
   RealtimeAPIModeContentType,
@@ -38,23 +37,20 @@ type multiModalAPIKeys = {
 }
 
 interface APIKeys {
-  openaiKey: string
-  anthropicKey: string
-  googleKey: string
-  azureKey: string
+  googleKey: string // Gemini API Key
+  koeiromapKey: string
+  youtubeApiKey: string
+  elevenlabsApiKey: string
+  azureTTSKey: string
+  azureTTSEndpoint: string
   groqKey: string
-  difyKey: string
   cohereKey: string
   mistralaiKey: string
   perplexityKey: string
   fireworksKey: string
+  difyKey: string
   deepseekKey: string
-  koeiromapKey: string
-  youtubeApiKey: string
-  elevenlabsApiKey: string
   azureEndpoint: string
-  azureTTSKey: string
-  azureTTSEndpoint: string
   customApiUrl: string
   customApiHeaders: string
   customApiBody: string
@@ -79,9 +75,11 @@ interface Live2DSettings {
 }
 
 interface ModelProvider extends Live2DSettings {
+  // AI Service Configuration
   selectAIService: AIService
   selectAIModel: string
   localLlmUrl: string
+  // Voice Settings
   selectVoice: AIVoice
   koeiroParam: KoeiroParam
   googleTtsType: string
@@ -168,7 +166,6 @@ export interface PresetQuestion {
 }
 
 interface General {
-  selectLanguage: Language
   changeEnglishToJapanese: boolean
   includeTimestampInUserMessage: boolean
   showControlPanel: boolean
@@ -214,33 +211,36 @@ const settingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       // API Keys
-      openaiKey:
-        process.env.NEXT_PUBLIC_OPENAI_API_KEY ||
-        process.env.NEXT_PUBLIC_OPENAI_KEY ||
+      googleKey:
+        process.env.NEXT_PUBLIC_GOOGLE_API_KEY ||
+        process.env.NEXT_PUBLIC_GOOGLE_KEY ||
         '',
-      anthropicKey: '',
-      googleKey: '',
-      azureKey:
-        process.env.NEXT_PUBLIC_AZURE_API_KEY ||
-        process.env.NEXT_PUBLIC_AZURE_KEY ||
-        '',
-      groqKey: '',
-      cohereKey: '',
-      mistralaiKey: '',
-      perplexityKey: '',
-      fireworksKey: '',
-      difyKey: '',
-      deepseekKey: '',
       koeiromapKey: process.env.NEXT_PUBLIC_KOEIROMAP_KEY || '',
       youtubeApiKey: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || '',
       elevenlabsApiKey: '',
+      azureTTSKey: '',
+      azureTTSEndpoint: '',
+
+      // Multimodal API Keys
+      openaiKey: process.env.NEXT_PUBLIC_OPENAI_KEY || '',
+      anthropicKey: process.env.NEXT_PUBLIC_ANTHROPIC_KEY || '',
+      azureKey: process.env.NEXT_PUBLIC_AZURE_KEY || '',
+      groqKey: process.env.NEXT_PUBLIC_GROQ_KEY || '',
+      cohereKey: process.env.NEXT_PUBLIC_COHERE_KEY || '',
+      mistralaiKey: process.env.NEXT_PUBLIC_MISTRALAI_KEY || '',
+      perplexityKey: process.env.NEXT_PUBLIC_PERPLEXITY_KEY || '',
+      fireworksKey: process.env.NEXT_PUBLIC_FIREWORKS_KEY || '',
+      difyKey: process.env.NEXT_PUBLIC_DIFY_KEY || '',
+      deepseekKey: process.env.NEXT_PUBLIC_DEEPSEEK_KEY || '',
       azureEndpoint: process.env.NEXT_PUBLIC_AZURE_ENDPOINT || '',
 
-      // Model Provider
+      // AI Service Configuration
       selectAIService:
         (process.env.NEXT_PUBLIC_SELECT_AI_SERVICE as AIService) || 'openai',
-      selectAIModel: process.env.NEXT_PUBLIC_SELECT_AI_MODEL || 'gpt-4',
+      selectAIModel: process.env.NEXT_PUBLIC_SELECT_AI_MODEL || '',
       localLlmUrl: process.env.NEXT_PUBLIC_LOCAL_LLM_URL || '',
+
+      // Model Provider - Fixed to Gemini 2.0 Flash
       selectVoice:
         (process.env.NEXT_PUBLIC_SELECT_VOICE as AIVoice) || 'voicevox',
       koeiroParam: DEFAULT_PARAM,
@@ -263,7 +263,7 @@ const settingsStore = create<SettingsState>()(
         parseFloat(process.env.NEXT_PUBLIC_AIVIS_SPEECH_INTONATION || '1.0') ||
         1.0,
       aivisSpeechServerUrl: '',
-      aivisCloudApiKey: process.env.AIVIS_CLOUD_API_KEY || '',
+      aivisCloudApiKey: process.env.NEXT_PUBLIC_AIVIS_CLOUD_API_KEY || '',
       aivisCloudModelUuid: process.env.NEXT_PUBLIC_AIVIS_CLOUD_MODEL_UUID || '',
       aivisCloudStyleId: process.env.NEXT_PUBLIC_AIVIS_CLOUD_STYLE_ID || '',
       aivisCloudStyleName: process.env.NEXT_PUBLIC_AIVIS_CLOUD_STYLE_NAME || '',
@@ -317,8 +317,6 @@ const settingsStore = create<SettingsState>()(
         (process.env.NEXT_PUBLIC_OPENAI_TTS_MODEL as OpenAITTSModel) || 'tts-1',
       openaiTTSSpeed:
         parseFloat(process.env.NEXT_PUBLIC_OPENAI_TTS_SPEED || '1.0') || 1.0,
-      azureTTSKey: '',
-      azureTTSEndpoint: '',
       customApiUrl: process.env.NEXT_PUBLIC_CUSTOM_API_URL || '',
       customApiHeaders: process.env.NEXT_PUBLIC_CUSTOM_API_HEADERS || '{}',
       customApiBody: process.env.NEXT_PUBLIC_CUSTOM_API_BODY || '{}',
@@ -374,12 +372,9 @@ const settingsStore = create<SettingsState>()(
       selectedVrmPath:
         process.env.NEXT_PUBLIC_SELECTED_VRM_PATH || '/vrm/AvatarSample_A.vrm',
       selectedLive2DPath:
-        process.env.NEXT_PUBLIC_SELECTED_LIVE2D_PATH ||
-        '/live2d/queue/queue.model3.json',
+        process.env.NEXT_PUBLIC_SELECTED_LIVE2D_PATH || '',
 
       // General
-      selectLanguage:
-        (process.env.NEXT_PUBLIC_SELECT_LANGUAGE as Language) || 'ja',
       changeEnglishToJapanese:
         process.env.NEXT_PUBLIC_CHANGE_ENGLISH_TO_JAPANESE === 'true',
       includeTimestampInUserMessage:
@@ -561,7 +556,6 @@ const settingsStore = create<SettingsState>()(
         showAssistantText: state.showAssistantText,
         showCharacterName: state.showCharacterName,
         systemPrompt: state.systemPrompt,
-        selectLanguage: state.selectLanguage,
         changeEnglishToJapanese: state.changeEnglishToJapanese,
         includeTimestampInUserMessage: state.includeTimestampInUserMessage,
         externalLinkageMode: state.externalLinkageMode,

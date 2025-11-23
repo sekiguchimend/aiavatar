@@ -2,8 +2,7 @@ import { buildUrl } from '@/utils/buildUrl'
 import Head from 'next/head'
 export const Meta = () => {
   const title = 'アバターデモ'
-  const description =
-    'Webブラウザだけで誰でも簡単にAIキャラと会話できます。'
+  const description = 'Webブラウザだけで誰でも簡単にAIキャラと会話できます。'
   const imageUrl = '/ogp.png'
   return (
     <Head>

@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import settingsStore, { SettingsState } from '@/features/stores/settings'
 import toastStore from '@/features/stores/toast'
 
 const CharacterPresetMenu = () => {
-  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const store = settingsStore()
   const selectedPresetIndex = store.selectedPresetIndex
@@ -60,9 +58,7 @@ const CharacterPresetMenu = () => {
     })
 
     toastStore.getState().addToast({
-      message: t('Toasts.PresetSwitching', {
-        presetName: customName,
-      }),
+      message: `${customName}に切り替わりました。`,
       type: 'info',
       tag: `character-preset-switching`,
     })
@@ -89,7 +85,7 @@ const CharacterPresetMenu = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-12 h-12 rounded-full bg-primary text-white shadow-lg flex items-center justify-center"
-        aria-label={t('CharacterSettingsPrompt')}
+        aria-label={'キャラクタープロンプト'}
         aria-expanded={isOpen}
         aria-controls="preset-menu"
       >
@@ -136,7 +132,7 @@ const CharacterPresetMenu = () => {
           role="menu"
         >
           <div className="text-sm font-bold mb-2 text-center text-gray-700">
-            {t('CharacterSettingsPrompt')}
+            {'キャラクタープロンプト'}
           </div>
           {characterPresets.map(({ key, value, customName }, index) => {
             const isSelected = selectedPresetIndex === index

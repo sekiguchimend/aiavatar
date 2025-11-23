@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import menuStore from '@/features/stores/menu'
 import Image from 'next/image'
 
@@ -8,7 +7,6 @@ import { IconButton } from '../iconButton'
 import Description from './description'
 import Based from './based'
 import Character from './character'
-import AI from './ai'
 import Voice from './voice'
 import Log from './log'
 import Other from './other'
@@ -46,7 +44,6 @@ type TabKey =
   | 'description'
   | 'based'
   | 'character'
-  | 'ai'
   | 'voice'
   | 'log'
   | 'other'
@@ -57,7 +54,6 @@ const tabIconMapping: Record<TabKey, string> = {
   description: '/images/setting-icons/description.svg',
   based: '/images/setting-icons/basic-settings.svg',
   character: '/images/setting-icons/character-settings.svg',
-  ai: '/images/setting-icons/ai-settings.svg',
   voice: '/images/setting-icons/voice-settings.svg',
   log: '/images/setting-icons/conversation-history.svg',
   other: '/images/setting-icons/other-settings.svg',
@@ -65,7 +61,6 @@ const tabIconMapping: Record<TabKey, string> = {
 }
 
 const Main = () => {
-  const { t } = useTranslation()
   const activeTab = menuStore((state) => state.activeSettingsTab)
   const setActiveTab = (tab: TabKey) => {
     menuStore.setState({ activeSettingsTab: tab })
@@ -74,35 +69,31 @@ const Main = () => {
   const tabs: { key: TabKey; label: string }[] = [
     {
       key: 'description',
-      label: t('Description'),
+      label: 'アプリについて',
     },
     {
       key: 'based',
-      label: t('BasedSettings'),
+      label: '基本設定',
     },
     {
       key: 'character',
-      label: t('CharacterSettings'),
-    },
-    {
-      key: 'ai',
-      label: t('AISettings'),
+      label: 'キャラクター設定',
     },
     {
       key: 'voice',
-      label: t('VoiceSettings'),
+      label: '合成音声設定',
     },
     {
       key: 'speechInput',
-      label: t('SpeechInputSettings'),
+      label: '音声入力設定',
     },
     {
       key: 'log',
-      label: t('LogSettings'),
+      label: '会話履歴',
     },
     {
       key: 'other',
-      label: t('OtherSettings'),
+      label: 'その他',
     },
   ]
 
@@ -114,8 +105,6 @@ const Main = () => {
         return <Based />
       case 'character':
         return <Character />
-      case 'ai':
-        return <AI />
       case 'voice':
         return <Voice />
       case 'log':

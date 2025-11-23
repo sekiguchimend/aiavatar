@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import settingsStore from '@/features/stores/settings'
 import toastStore from '@/features/stores/toast'
 import homeStore from '@/features/stores/home'
@@ -12,9 +11,6 @@ import { SpeakQueue } from '@/features/messages/speakQueue'
 export const useWhisperRecognition = (
   onChatProcessStart: (text: string) => void
 ) => {
-  const { t } = useTranslation()
-  const selectLanguage = settingsStore((s) => s.selectLanguage)
-
   // ----- 状態管理 -----
   const [userMessage, setUserMessage] = useState('')
   const [isListening, setIsListening] = useState(false)
@@ -57,10 +53,8 @@ export const useWhisperRecognition = (
       // FormDataにファイルを追加
       formData.append('file', audioBlob, fileName)
 
-      // 言語設定の追加
-      if (selectLanguage) {
-        formData.append('language', selectLanguage)
-      }
+      // 言語設定の追加（日本語固定）
+      formData.append('language', 'ja')
 
       // OpenAI APIキーを追加
       const openaiKey = settingsStore.getState().openaiKey
@@ -94,7 +88,7 @@ export const useWhisperRecognition = (
     } catch (error) {
       console.error('Whisper transcription error:', error)
       toastStore.getState().addToast({
-        message: t('Toasts.WhisperError'),
+        message: 'Whisperによる音声認識でエラーが発生しました',
         type: 'error',
         tag: 'whisper-error',
       })
@@ -134,7 +128,7 @@ export const useWhisperRecognition = (
         } else {
           console.log('Whisper returned empty transcription')
           toastStore.getState().addToast({
-            message: t('Toasts.NoSpeechDetected'),
+            message: '音声が検出されませんでした。',
             type: 'info',
             tag: 'no-speech-detected',
           })
@@ -142,7 +136,7 @@ export const useWhisperRecognition = (
       } catch (error) {
         console.error('Error processing Whisper audio:', error)
         toastStore.getState().addToast({
-          message: t('Toasts.WhisperError'),
+          message: 'Whisperによる音声認識でエラーが発生しました',
           type: 'error',
           tag: 'whisper-error',
         })
@@ -150,12 +144,12 @@ export const useWhisperRecognition = (
     } else {
       console.warn('No audio data recorded')
       toastStore.getState().addToast({
-        message: t('Toasts.NoSpeechDetected'),
+        message: '音声が検出されませんでした。',
         type: 'info',
         tag: 'no-speech-detected',
       })
     }
-  }, [stopRecording, processWhisperRecognition, onChatProcessStart, t])
+  }, [stopRecording, processWhisperRecognition, onChatProcessStart])
 
   // ----- 音声認識開始処理 -----
   const startListening = useCallback(async () => {
@@ -172,12 +166,12 @@ export const useWhisperRecognition = (
       setIsListening(true)
     } else {
       toastStore.getState().addToast({
-        message: t('Toasts.SpeechRecognitionError'),
+        message: '音声認識エラーが発生しました',
         type: 'error',
         tag: 'speech-recognition-error',
       })
     }
-  }, [startRecording, t])
+  }, [startRecording])
 
   // ----- 音声認識トグル処理 -----
   const toggleListening = useCallback(() => {

@@ -8,15 +8,19 @@ export default function VrmViewer() {
     if (canvas) {
       const { viewer } = homeStore.getState()
       let { selectedVrmPath } = settingsStore.getState()
-      
+
       // デフォルトのVRMパスを設定（空または無効な場合）
-      if (!selectedVrmPath || selectedVrmPath === '' || !selectedVrmPath.endsWith('.vrm')) {
+      if (
+        !selectedVrmPath ||
+        selectedVrmPath === '' ||
+        !selectedVrmPath.endsWith('.vrm')
+      ) {
         selectedVrmPath = '/vrm/AvatarSample_A.vrm'
         settingsStore.setState({ selectedVrmPath })
       }
-      
+
       viewer.setup(canvas)
-      
+
       // VRMファイルの読み込み（エラーハンドリング付き）
       const loadVrmWithFallback = async (vrmPath: string) => {
         try {
@@ -37,7 +41,7 @@ export default function VrmViewer() {
           }
         }
       }
-      
+
       loadVrmWithFallback(selectedVrmPath)
 
       // Drag and DropでVRMを差し替え

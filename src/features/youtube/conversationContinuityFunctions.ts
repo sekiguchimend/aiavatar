@@ -1,8 +1,22 @@
 import { Message } from '@/features/messages/messages'
-import { getVercelAIChatResponse } from '@/features/chat/vercelAIChat'
+import { getAIChatResponseStream } from '@/features/chat/aiChatFactory'
 
 const fetchAIResponse = async (queryMessages: any[]): Promise<any> => {
-  return getVercelAIChatResponse(queryMessages)
+  const stream = await getAIChatResponseStream(queryMessages)
+  if (!stream) {
+    throw new Error('Failed to get AI response stream')
+  }
+
+  const reader = stream.getReader()
+  let text = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) break
+    text += value
+  }
+
+  return { text }
 }
 
 /**

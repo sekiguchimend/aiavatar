@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
 import { IconButton } from './iconButton'
-import { useTranslation } from 'react-i18next'
-
 type ToastProps = {
   message: string
   type: 'success' | 'error' | 'info' | 'tool'
@@ -17,8 +15,6 @@ export const Toast = ({
   duration = 5000,
   closing = false,
 }: ToastProps) => {
-  const { t } = useTranslation()
-
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose()
@@ -65,7 +61,7 @@ export const Toast = ({
           iconColor={getIconColor()}
           className="!p-2 !bg-transparent !hover:bg-black/10"
         />
-        <span className="mr-2">{t(message)}</span>
+        <span className="mr-2">{message}</span>
       </div>
       <IconButton
         iconName="24/Close"

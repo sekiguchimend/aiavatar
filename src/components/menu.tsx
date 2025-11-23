@@ -1,18 +1,14 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import homeStore from '@/features/stores/home'
 import menuStore from '@/features/stores/menu'
-import settingsStore, {
-  multiModalAIServiceKey,
-} from '@/features/stores/settings'
+import settingsStore from '@/features/stores/settings'
 import { AssistantText } from './assistantText'
 import { ChatLog } from './chatLog'
 import { IconButton } from './iconButton'
 import Settings from './settings'
 import { Webcam } from './webcam'
 import Capture from './capture'
-import { multiModalAIServices } from '@/features/stores/settings'
 
 // モバイルデバイス検出用のカスタムフック
 const useIsMobile = () => {
@@ -37,7 +33,6 @@ const useIsMobile = () => {
 }
 
 export const Menu = () => {
-  const selectAIService = settingsStore((s) => s.selectAIService)
   const assistantMessage = homeStore((s) => s.assistantMessage)
   const showWebcam = menuStore((s) => s.showWebcam)
   const showControlPanel = settingsStore((s) => s.showControlPanel)
@@ -56,8 +51,6 @@ export const Menu = () => {
   // モバイルデバイス検出
   const isMobile = useIsMobile()
 
-  const { t } = useTranslation()
-
   // ロングタップ処理用の関数
   const handleTouchStart = () => {
     setTouchStartTime(Date.now())
@@ -75,7 +68,6 @@ export const Menu = () => {
   const handleTouchCancel = () => {
     setTouchStartTime(null)
   }
-
 
   const handleChangeVrmFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,73 +175,67 @@ export const Menu = () => {
                 {showChatLog ? (
                   <IconButton
                     iconName="24/CommentOutline"
-                    label={t('ChatLog')}
+                    label="会話ログ"
                     isProcessing={false}
                     onClick={() => setShowChatLog(false)}
                   />
                 ) : (
                   <IconButton
                     iconName="24/CommentFill"
-                    label={t('ChatLog')}
+                    label="会話ログ"
                     isProcessing={false}
                     disabled={false}
                     onClick={() => setShowChatLog(true)}
                   />
                 )}
               </div>
-              {multiModalAIServices.includes(
-                selectAIService as multiModalAIServiceKey
-              ) && (
-                <>
-                  <div className="order-3">
-                    <IconButton
-                      iconName="screen-share"
-                      isProcessing={false}
-                      onClick={toggleCapture}
-                    />
-                  </div>
-                  <div className="order-4">
-                    <IconButton
-                      iconName="24/Camera"
-                      isProcessing={false}
-                      onClick={toggleWebcam}
-                    />
-                  </div>
-                  <div className="order-4">
-                    <IconButton
-                      iconName="24/AddImage"
-                      isProcessing={false}
-                      onClick={() => imageFileInputRef.current?.click()}
-                    />
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      ref={imageFileInputRef}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0]
-                        if (file) {
-                          const reader = new FileReader()
-                          reader.onload = (e) => {
-                            const imageUrl = e.target?.result as string
-                            homeStore.setState({ modalImage: imageUrl })
-                          }
-                          reader.readAsDataURL(file)
-                        }
-                      }}
-                    />
-                  </div>
-                </>
-              )}
+              <div className="order-3">
+                <IconButton
+                  iconName="screen-share"
+                  isProcessing={false}
+                  onClick={toggleCapture}
+                />
+              </div>
+              <div className="order-4">
+                <IconButton
+                  iconName="24/Camera"
+                  isProcessing={false}
+                  onClick={toggleWebcam}
+                />
+              </div>
+              <div className="order-4">
+                <IconButton
+                  iconName="24/AddImage"
+                  isProcessing={false}
+                  onClick={() => imageFileInputRef.current?.click()}
+                />
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  ref={imageFileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      const reader = new FileReader()
+                      reader.onload = (e) => {
+                        const imageUrl = e.target?.result as string
+                        homeStore.setState({ modalImage: imageUrl })
+                      }
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                />
+              </div>
             </>
           )}
         </div>
       </div>
       {showChatLog && <ChatLog />}
       {showSettings && <Settings onClickClose={() => setShowSettings(false)} />}
-      {!showChatLog &&
-        assistantMessage &&
-        showAssistantText && <AssistantText message={assistantMessage} />}
+      {!showChatLog && assistantMessage && showAssistantText && (
+        <AssistantText message={assistantMessage} />
+      )}
       {showWebcam && navigator.mediaDevices && <Webcam />}
       {showCapture && <Capture />}
       {showPermissionModal && (

@@ -1,6 +1,4 @@
 import Image from 'next/image'
-import { useTranslation } from 'react-i18next'
-
 import homeStore from '@/features/stores/home'
 import settingsStore from '@/features/stores/settings'
 import { TextButton } from '../textButton'
@@ -10,10 +8,7 @@ const Log = () => {
   const chatLog = messageSelectors.getTextAndImageMessages(
     homeStore((s) => s.chatLog)
   )
-  const selectAIService = settingsStore((s) => s.selectAIService)
   const maxPastMessages = settingsStore((s) => s.maxPastMessages)
-
-  const { t } = useTranslation()
 
   const handleChangeChatLog = (targetIndex: number, text: string) => {
     const newChatLog = chatLog.map((m, i) => {
@@ -34,12 +29,10 @@ const Log = () => {
             height={24}
             className="mr-2"
           />
-          <h2 className="text-2xl font-bold">{t('ConversationHistory')}</h2>
+          <h2 className="text-2xl font-bold">{'会話履歴'}</h2>
         </div>
         <div className="my-2">
-          {selectAIService !== 'dify'
-            ? t('ConversationHistoryInfo', { count: maxPastMessages })
-            : t('DifyInfo2')}
+          {`直近の${maxPastMessages}会話文が記憶として保持されます。`}
         </div>
         <TextButton
           onClick={() => {
@@ -47,7 +40,7 @@ const Log = () => {
             settingsStore.setState({ difyConversationId: '' })
           }}
         >
-          {t('ConversationHistoryReset')}
+          {'会話履歴リセット'}
         </TextButton>
       </div>
 

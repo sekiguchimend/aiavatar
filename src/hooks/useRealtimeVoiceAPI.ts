@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import settingsStore from '@/features/stores/settings'
 import webSocketStore from '@/features/stores/websocketStore'
 import toastStore from '@/features/stores/toast'
@@ -15,8 +14,6 @@ import { SpeakQueue } from '@/features/messages/speakQueue'
 export const useRealtimeVoiceAPI = (
   onChatProcessStart: (text: string) => void
 ) => {
-  const { t } = useTranslation()
-  const selectLanguage = settingsStore((s) => s.selectLanguage)
   const realtimeAPIMode = settingsStore((s) => s.realtimeAPIMode)
   const initialSpeechTimeout = settingsStore((s) => s.initialSpeechTimeout)
 
@@ -301,12 +298,12 @@ export const useRealtimeVoiceAPI = (
     if (!success) {
       console.error('Failed to start recording')
       toastStore.getState().addToast({
-        message: t('Toasts.SpeechRecognitionError'),
+        message: '音声認識エラーが発生しました',
         type: 'error',
         tag: 'speech-recognition-error',
       })
     }
-  }, [recognition, audioContext, checkMicrophonePermission, startRecording, t])
+  }, [recognition, audioContext, checkMicrophonePermission, startRecording])
 
   // ----- 音声認識トグル処理 -----
   const toggleListening = useCallback(() => {

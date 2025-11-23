@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import Image from 'next/image'
 import settingsStore from '@/features/stores/settings'
 import { TextButton } from '../textButton'
@@ -7,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid'
 import Link from 'next/link'
 
 const MessageReceiverSetting = () => {
-  const { t } = useTranslation()
   const { messageReceiverEnabled, clientId } = settingsStore()
 
   const generateClientId = useCallback(() => {
@@ -33,17 +31,21 @@ const MessageReceiverSetting = () => {
 
   return (
     <div className="mt-2 mb-2">
-      <div className="my-4 text-xl font-bold">{t('MessageReceiver')}</div>
-      <p className="">{t('MessageReceiverDescription')}</p>
+      <div className="my-4 text-xl font-bold">
+        {'外部からの指示を受け付ける'}
+      </div>
+      <p className="">
+        {'APIを利用してAIキャラの発言を外部から指示することができます。'}
+      </p>
       <div className="my-2">
         <TextButton onClick={toggleMessageReceiver}>
-          {messageReceiverEnabled ? t('StatusOn') : t('StatusOff')}
+          {messageReceiverEnabled ? '状態:ON' : '状態:OFF'}
         </TextButton>
       </div>
       {messageReceiverEnabled && clientId && (
         <>
           <div className="mt-4">
-            <div className="font-bold">{t('ClientID')}</div>
+            <div className="font-bold">{'Client ID'}</div>
             <div className="bg-gray-100 p-2 rounded">{clientId}</div>
           </div>
           <div className="mt-4">
@@ -53,7 +55,7 @@ const MessageReceiverSetting = () => {
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-3 py-2 text-sm bg-primary hover:bg-primary-hover rounded-3xl text-white font-bold transition-colors duration-200 whitespace-nowrap"
               >
-                {t('OpenSendMessagePage')}
+                {'メッセージ送信ページを開く'}
                 <Image
                   src="/images/icons/external-link.svg"
                   alt="open in new tab"
